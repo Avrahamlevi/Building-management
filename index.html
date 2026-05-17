@@ -2,586 +2,415 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ניהול בניין</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f5f5f5;color:#222;direction:rtl;padding:16px}
-h1{font-size:22px;margin-bottom:16px}
-.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #ddd;flex-wrap:wrap}
-.tab{padding:8px 16px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:14px;color:#666;margin-bottom:-2px;white-space:nowrap}
-.tab.on{border-bottom-color:#2563eb;color:#2563eb;font-weight:600}
-.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:10px}
+body{font-family:Arial,sans-serif;background:#f0f0f0;color:#1a1a1a;direction:rtl;min-height:100vh}
+#header{background:#1e3a5f;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px}
+#header h1{font-size:20px;font-weight:700}
+#main{max-width:960px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:0;margin-bottom:16px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #ddd}
+.tab{flex:1;padding:10px 8px;background:none;border:none;cursor:pointer;font-size:13px;color:#666;font-weight:500;transition:background .15s;border-left:1px solid #eee}
+.tab:last-child{border-left:none}
+.tab.on{background:#1e3a5f;color:#fff}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .card.sel{border-color:#2563eb;border-width:2px}
-.card.archived{opacity:.7;border-style:dashed}
-label,.lbl{font-size:12px;color:#666;display:block;margin-bottom:2px}
-input,select,textarea{padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px;font-family:inherit;width:100%}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb}
-textarea{resize:vertical;min-height:60px}
-.btn{padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn:hover{background:#f0f0f0}
-.btn-blue{background:#2563eb;color:#fff;border-color:#2563eb}
-.btn-blue:hover{background:#1d4ed8}
-.btn-green{background:#16a34a;color:#fff;border-color:#16a34a}
-.btn-green:hover{background:#15803d}
-.btn-red{color:#dc2626;border-color:#fca5a5}
-.btn-red:hover{background:#fef2f2}
-.btn-orange{background:#ea580c;color:#fff;border-color:#ea580c}
-.btn-orange:hover{background:#c2410c}
-.btn-sm{padding:4px 10px;font-size:12px}
-.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;white-space:nowrap}
-.b-green{background:#dcfce7;color:#166534}
-.b-yellow{background:#fef9c3;color:#854d0e}
-.b-gray{background:#f3f4f6;color:#4b5563}
-.b-blue{background:#dbeafe;color:#1e40af}
-.b-red{background:#fee2e2;color:#991b1b}
-.b-orange{background:#ffedd5;color:#9a3412}
-.asset-head{display:flex;align-items:center;gap:10px}
-.num-box{min-width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;padding:0 6px}
-.info{flex:1;min-width:0}
-.info-main{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
-.info-sub{font-size:12px;color:#666}
-.detail{border-top:1px solid #eee;margin-top:12px;padding-top:12px}
-.section-h{font-weight:600;font-size:14px;margin:0 0 10px}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
-.form-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:10px}
-.form-box.warn{background:#fff7ed;border-color:#fed7aa}
-.tenant-card{border:1px solid #ddd;border-radius:8px;margin-bottom:8px;overflow:hidden}
-.tenant-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f9fafb;cursor:pointer}
-.tenant-body{padding:12px;border-top:1px solid #eee;display:none}
-.tenant-body.open{display:block}
-.tenant-card.active-tenant{border-color:#16a34a;border-width:2px}
-.tenant-card.active-tenant .tenant-header{background:#f0fdf4}
-.tenant-card.archived-tenant{border-color:#d1d5db;opacity:.8}
-.tenant-card.archived-tenant .tenant-header{background:#f9fafb}
-.doc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f9fafb;border-radius:6px;margin-bottom:5px;font-size:13px}
+.form-panel{background:#eef4ff;border:1px solid #c7d9f5;border-radius:10px;padding:16px;margin-bottom:12px}
+.lbl{font-size:12px;color:#555;display:block;margin-bottom:3px;font-weight:500}
+input,select,textarea{padding:7px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px;font-family:inherit;width:100%;background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px #dbeafe}
+textarea{resize:vertical;min-height:70px}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid #ccc;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s}
+.btn:hover{filter:brightness(.95)}
+.blue{background:#2563eb;color:#fff;border-color:#2563eb}
+.green{background:#16a34a;color:#fff;border-color:#16a34a}
+.orange{background:#ea580c;color:#fff;border-color:#ea580c}
+.red{color:#dc2626;border-color:#fca5a5;background:#fff}
+.gray{background:#f3f4f6;color:#374151;border-color:#d1d5db}
+.sm{padding:5px 10px;font-size:12px}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#dcfce7;color:#166534}
+.by{background:#fef9c3;color:#854d0e}
+.bb{background:#dbeafe;color:#1e40af}
+.br{background:#fee2e2;color:#991b1b}
+.bgr{background:#f3f4f6;color:#4b5563}
+.bo{background:#ffedd5;color:#9a3412}
+.grid{display:grid;gap:8px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.col{display:flex;flex-direction:column;gap:3px}
+.flex{display:flex;align-items:center;gap:8px}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.sep{border:none;border-top:1px solid #e5e7eb;margin:12px 0}
+.muted{color:#6b7280;font-size:12px}
+.empty{color:#9ca3af;font-size:13px;padding:12px 0;text-align:center}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px}
+.metric{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:12px;text-align:center}
+.metric .v{font-size:22px;font-weight:700;color:#1e3a5f;margin:4px 0 2px}
+.metric .l{font-size:11px;color:#888}
+.t-card{border:1px solid #e5e7eb;border-radius:8px;margin-top:10px;overflow:hidden}
+.t-card.active{border-color:#16a34a;border-width:2px}
+.t-card.arch{border-color:#d1d5db;opacity:.85}
+.t-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f9fafb;cursor:pointer;gap:8px}
+.t-head:hover{background:#f3f4f6}
+.t-body{padding:14px;border-top:1px solid #e5e7eb;display:none}
+.t-body.open{display:block}
+.doc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f8fafc;border-radius:6px;margin-bottom:4px;font-size:13px;border:1px solid #e2e8f0}
 .doc-link{color:#2563eb;text-decoration:none;font-size:13px}
 .doc-link:hover{text-decoration:underline}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
-.metric{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center}
-.metric .v{font-size:20px;font-weight:700;margin:4px 0 2px}
-.metric .l{font-size:11px;color:#888}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:6px 10px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #eee;font-size:12px;white-space:nowrap}
-td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-tr:nth-child(even) td{background:#fafafa}
-.cmp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.cmp-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px}
-.cmp-rows{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
-.cmp-cell{background:#f5f5f5;border-radius:6px;padding:5px 8px}
-.cmp-lbl{font-size:10px;color:#888}
-.cmp-val{font-size:13px;font-weight:600}
-.saving{position:fixed;bottom:16px;left:16px;background:#1d4ed8;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;z-index:999;display:none}
-.loading{text-align:center;padding:60px;color:#888;font-size:16px}
-.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end}
-.col{display:flex;flex-direction:column;gap:3px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
-.ov{overflow-x:auto;margin-bottom:24px}
-.empty{font-size:12px;color:#aaa;padding:8px 0}
-.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px}
-.alert-yellow{background:#fef9c3;border:1px solid #fde047;color:#713f12}
-.sep{border:none;border-top:1px solid #eee;margin:12px 0}
-.actions-row{display:flex;gap:6px;flex-wrap:wrap}
+th{padding:8px 10px;text-align:right;color:#555;font-weight:600;border-bottom:2px solid #e5e7eb;font-size:12px;white-space:nowrap;background:#f9fafb}
+td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tr:hover td{background:#fafafa}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:12px;padding:20px;max-width:580px;width:100%;max-height:90vh;overflow-y:auto}
+.alert-y{background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:10px 14px;font-size:13px;color:#713f12;margin-bottom:12px}
+.info-cell{background:#f8fafc;border-radius:6px;padding:7px 10px}
+.info-cell .cl{font-size:10px;color:#888;margin-bottom:2px}
+.info-cell .cv{font-size:13px;font-weight:600}
+.saving{position:fixed;bottom:20px;right:20px;background:#1e3a5f;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;z-index:200;display:none;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.ov{overflow-x:auto;margin-bottom:20px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
 <body>
-<h1>🏢 מערכת ניהול בניין</h1>
-<div class="tabs" id="tabs"></div>
-<div id="app"><div class="loading">⏳ טוען נתונים...</div></div>
+<div id="header"><h1>🏢 מערכת ניהול בניין</h1></div>
+<div id="main">
+  <div class="tabs" id="tabs"></div>
+  <div id="app"></div>
+</div>
 <div class="saving" id="saving">💾 שומר...</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const app = firebase.initializeApp({ databaseURL:"https://building-management-a4899-default-rtdb.firebaseio.com" });
-const db = firebase.database();
-const dataRef = db.ref("building2");
+// ══ קבועים ══
+const APT_FLOORS=[0,1,2,3,4,5,6,7];
+const STOR_FLOORS=[-1,-2];
+const APT_AREAS=[30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150];
+const STOR_AREAS=[3,4,5,6,7,8,9,10,12,15,20];
+const BALCONIES=[0,3,4,5,6,7,8,9,10,12,15,20];
+const TABS=["דירות","מחסנים","ניתוח","השוואה"];
+const KEY="bldg_v3";
 
-const APT_FLOORS = [0,1,2,3,4,5,6,7];
-const STOR_FLOORS = [-1,-2];
-const fmtFloor = f => f===0?"קומת קרקע":f<0?`קומה מינוס ${Math.abs(f)}`:`קומה ${f}`;
-const TABS = ["דירות","מחסנים","ניתוח","השוואה"];
-
-const fmtDate = d => d?new Date(d).toLocaleDateString("he-IL"):"—";
-const daysBetween = (a,b) => Math.max(0,Math.round((new Date(b)-new Date(a))/86400000));
-const monthsBetween = (a,b) => { const d1=new Date(a),d2=new Date(b); return Math.max(0,(d2.getFullYear()-d1.getFullYear())*12+d2.getMonth()-d1.getMonth()); };
-const today = () => new Date().toISOString().slice(0,10);
-const uid = () => Date.now()+Math.random().toString(36).slice(2,7);
-const getActiveTenant = asset => asset.tenants?.find(t=>t.status==="active")||null;
-const calcOcc = (asset,from,to) => {
-  const tot=daysBetween(from,to); if(!tot) return 0;
+const fmtFloor=f=>f===0?"קומת קרקע":f<0?`קומה מינוס ${Math.abs(f)}`:`קומה ${f}`;
+const fmtDate=d=>d?new Date(d).toLocaleDateString("he-IL"):"—";
+const daysBetween=(a,b)=>Math.max(0,Math.round((new Date(b)-new Date(a))/86400000));
+const monthsBetween=(a,b)=>{const d1=new Date(a),d2=new Date(b);return Math.max(0,(d2.getFullYear()-d1.getFullYear())*12+d2.getMonth()-d1.getMonth());};
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const getActive=a=>(a.tenants||[]).find(t=>t.status==="active")||null;
+const calcOcc=(a,from,to)=>{
+  const tot=daysBetween(from,to);if(!tot)return 0;
   let occ=0;
-  for(const t of (asset.tenants||[])){
-    if(!t.startDate) continue;
+  for(const t of(a.tenants||[])){
+    if(!t.startDate)continue;
     const end=t.endDate||to;
-    const s=t.startDate>from?t.startDate:from, e=end<to?end:to;
-    if(s<e) occ+=daysBetween(s,e);
+    const s=t.startDate>from?t.startDate:from,e=end<to?end:to;
+    if(s<e)occ+=daysBetween(s,e);
   }
   return Math.min(100,Math.round(occ/tot*100));
 };
 
-let state = {
-  tab:"דירות", apts:[], storages:[], selectedId:null,
-  showAdd:false, expandedTenant:{},
-  filterArea:{apt:"all",stor:"all"}, filterFloor:{apt:"all",stor:"all"},
-  newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""},
-  reportFrom:new Date().getFullYear()+"-01-01",
-  reportTo:new Date().getFullYear()+"-12-31",
-  compareType:"apt", compareArea:"all",
-  modal:null
-};
-
-let saveTimer=null;
-function saveDB(){
+// ══ State ══
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function save(){
   document.getElementById("saving").style.display="block";
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    dataRef.set({apts:state.apts,storages:state.storages})
-      .finally(()=>document.getElementById("saving").style.display="none");
-  },600);
+  try{localStorage.setItem(KEY,JSON.stringify({apts:S.apts,storages:S.storages}));}catch(e){}
+  setTimeout(()=>document.getElementById("saving").style.display="none",600);
 }
-function setState(patch,save=true){ Object.assign(state,patch); if(save) saveDB(); render(); }
+const saved=load();
+const S={
+  tab:"דירות",apts:saved?.apts||[],storages:saved?.storages||[],
+  sel:null,showAdd:null,expanded:{},modal:null,
+  fArea:{apt:"all",stor:"all"},fFloor:{apt:"all",stor:"all"},
+  newA:{number:"",floor:"",area:"",balcony:"",linkedApt:""},
+  repFrom:new Date().getFullYear()+"-01-01",repTo:new Date().getFullYear()+"-12-31",
+  cmpType:"apt",cmpArea:"all"
+};
+function set(patch,doSave=true){Object.assign(S,patch);if(doSave)save();render();}
 
-// ── DOM helpers ──
-const el=(tag,attrs={},children=[])=>{
-  const e=document.createElement(tag);
-  for(const [k,v] of Object.entries(attrs)){
-    if(k==="style"&&typeof v==="object") Object.assign(e.style,v);
-    else if(k.startsWith("on")) e[k]=v;
-    else if(k==="className") e.className=v;
+// ══ DOM helpers ══
+const ce=(t,p={},ch=[])=>{
+  const e=document.createElement(t);
+  for(const[k,v]of Object.entries(p)){
+    if(k==="cls")e.className=v;
+    else if(k==="html")e.innerHTML=v;
+    else if(k==="txt")e.textContent=v;
+    else if(k.startsWith("on"))e[k]=v;
     else e.setAttribute(k,v);
   }
-  for(const c of children){
-    if(c==null) continue;
-    if(typeof c==="string"||typeof c==="number") e.appendChild(document.createTextNode(c));
-    else e.appendChild(c);
-  }
+  ch.forEach(c=>{if(c==null)return;e.appendChild(typeof c==="string"||typeof c==="number"?Object.assign(document.createTextNode(""),{data:c}):c);});
   return e;
 };
-const div=(cls,children=[])=>el("div",{className:cls},Array.isArray(children)?children:[children]);
-const span=(cls,text)=>el("span",{className:cls},[text]);
-const badge=(cls,text)=>span(`badge ${cls}`,text);
-const btn=(cls,text,onclick)=>el("button",{className:`btn ${cls}`,onclick},typeof text==="string"?[text]:[text]);
-const lbl=text=>el("label",{className:"lbl"},[text]);
-const inp=(type,val,onchange,placeholder="")=>{
-  const e=document.createElement("input");
-  e.type=type; e.value=val||""; e.placeholder=placeholder;
-  e.oninput=ev=>onchange(ev.target.value);
-  return e;
-};
-const sel=(options,val,onchange)=>{
+const D=(cls,ch=[])=>ce("div",{cls},Array.isArray(ch)?ch:[ch]);
+const Span=(cls,txt)=>ce("span",{cls,txt});
+const Bdg=(cls,txt)=>ce("span",{cls:"badge "+cls,txt});
+const Btn=(cls,txt,fn)=>ce("button",{cls:"btn "+cls,onclick:fn,txt});
+const Lbl=txt=>ce("label",{cls:"lbl",txt});
+const Inp=(type,val,fn,ph="")=>{const e=ce("input",{type,placeholder:ph});e.value=val||"";e.oninput=ev=>fn(ev.target.value);return e;};
+const Sel=(opts,val,fn)=>{
   const e=document.createElement("select");
-  options.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;if(String(v)===String(val))o.selected=true;e.appendChild(o);});
-  e.onchange=ev=>onchange(ev.target.value);
-  return e;
+  opts.forEach(([v,t])=>{const o=ce("option",{value:v,txt:t});if(String(v)===String(val))o.selected=true;e.appendChild(o);});
+  e.onchange=ev=>fn(ev.target.value);return e;
 };
-const colDiv=(labelText,child)=>{ const d=div("col",[lbl(labelText),child]); return d; };
-const textarea=(val,onchange,placeholder="")=>{
-  const e=document.createElement("textarea");
-  e.value=val||""; e.placeholder=placeholder;
-  e.oninput=ev=>onchange(ev.target.value);
-  return e;
-};
+const Col=(lbl,child)=>D("col",[Lbl(lbl),child]);
+const Ta=(val,fn,ph="")=>{const e=ce("textarea",{placeholder:ph});e.value=val||"";e.oninput=ev=>fn(ev.target.value);return e;};
 
-// ── Tenant status badge ──
-function tenantStatusBadge(t){
-  if(t.status==="active") return badge("b-green","דייר פעיל");
-  if(t.status==="archived") return badge("b-gray","ארכיון");
-  return badge("b-gray","");
-}
-
-// ── Modal ──
-function showModal(content){
-  setState({modal:content},false);
-}
-function closeModal(){ setState({modal:null},false); }
-
+// ══ Modal ══
+function openModal(content){set({modal:content},false);}
+function closeModal(){set({modal:null},false);}
 function renderModal(){
-  if(!state.modal) return null;
-  const overlay=div("",[ ]);
-  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px";
-  const box=div("card",[]);
-  box.style.cssText="max-width:560px;width:100%;max-height:90vh;overflow-y:auto;margin:0";
+  if(!S.modal)return null;
+  const ov=D("overlay");
+  ov.onclick=closeModal;
+  const box=D("modal");
   box.onclick=e=>e.stopPropagation();
-  box.appendChild(state.modal);
-  overlay.onclick=closeModal;
-  overlay.appendChild(box);
-  return overlay;
+  box.appendChild(S.modal);
+  ov.appendChild(box);
+  return ov;
 }
 
-// ── New tenant form ──
-function buildNewTenantForm(assetId, isApt, onSave){
-  let data={name:"",phone:"",email:"",idNum:"",startDate:"",endDate:"",rent:"",vaad:"",deposit:"",notes:"",docs:[]};
-  let newDocName="", newDocUrl="";
-  const wrapper=div("",[]);
-
-  function rebuild(){
-    wrapper.innerHTML="";
-    const title=div("section-h",["➕ הוסף דייר חדש"]);
-    wrapper.appendChild(title);
-    const grid=div("form-grid",[]);
-    const fields=[
-      ["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
-      ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
-      ["תאריך יציאה משוער","endDate","date"],
-      ['שכ"ד ₪',"rent","number"],
-      ...(isApt?[["ועד בית ₪","vaad","number"]]:[]),
-      ["פיקדון ₪","deposit","number"],
-    ];
-    fields.forEach(([l,k,t])=>{
-      const input=inp(t,data[k],v=>{data[k]=v;});
-      grid.appendChild(colDiv(l,input));
+// ══ Tenant form ══
+function tenantForm(init,title,onSave){
+  const d={name:"",phone:"",email:"",idNum:"",startDate:"",endDate:"",
+           rent:"",vaad:"",deposit:"",notes:"",docs:[],...init};
+  let dName="",dUrl="";
+  const wrap=D("");
+  function build(){
+    wrap.innerHTML="";
+    wrap.appendChild(ce("h3",{cls:"",html:"<b>"+title+"</b>",style:"margin-bottom:12px;font-size:15px"}));
+    const g=D("grid g3");
+    [["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
+     ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
+     ["תאריך יציאה","endDate","date"],['שכ"ד ₪',"rent","number"],
+     ["ועד בית ₪","vaad","number"],["פיקדון ₪","deposit","number"]
+    ].forEach(([l,k,t])=>{g.appendChild(Col(l,Inp(t,d[k],v=>{d[k]=v;})));});
+    wrap.appendChild(g);
+    wrap.appendChild(ce("hr",{cls:"sep"}));
+    wrap.appendChild(D("",[Lbl("הערות"),Ta(d.notes,v=>{d.notes=v;},"הערות חופשיות...")]));
+    wrap.appendChild(ce("hr",{cls:"sep"}));
+    wrap.appendChild(ce("p",{cls:"lbl",txt:"📎 קישורי מסמכים (גוגל דרייב, דרופבוקס...)"}));
+    (d.docs||[]).forEach((doc,i)=>{
+      wrap.appendChild(D("doc-row",[
+        ce("a",{cls:"doc-link",href:doc.url,target:"_blank",txt:doc.name}),
+        Btn("red sm","✕",()=>{d.docs.splice(i,1);build();})
+      ]));
     });
-    wrapper.appendChild(grid);
-    const notesDiv=div("",[lbl("הערות"), textarea(data.notes,v=>{data.notes=v;},"הערות חופשיות...")]);
-    notesDiv.style.marginBottom="10px";
-    wrapper.appendChild(notesDiv);
-
-    // Docs
-    const docTitle=div("",["📎 קישורי מסמכים (גוגל דרייב וכו')"]);
-    docTitle.style.cssText="font-size:13px;font-weight:600;margin-bottom:6px";
-    wrapper.appendChild(docTitle);
-    data.docs.forEach((doc,i)=>{
-      const row=div("doc-row",[
-        el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
-        btn("btn-red btn-sm","✕",()=>{data.docs=data.docs.filter((_,j)=>j!==i);rebuild();})
-      ]);
-      wrapper.appendChild(row);
-    });
-    const docRow=div("row",[]);
-    const nameInp=inp("text",newDocName,v=>{newDocName=v;},"שם המסמך");
-    nameInp.style.width="160px";
-    const urlInp=inp("text",newDocUrl,v=>{newDocUrl=v;},"קישור (URL)");
-    const addDocBtn=btn("btn-sm","+ הוסף קישור",()=>{
-      if(!newDocName||!newDocUrl) return;
-      data.docs.push({id:uid(),name:newDocName,url:newDocUrl});
-      newDocName=""; newDocUrl=""; rebuild();
-    });
-    docRow.appendChild(nameInp); docRow.appendChild(urlInp); docRow.appendChild(addDocBtn);
-    wrapper.appendChild(docRow);
-
-    const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
-    const btns=div("actions-row",[
-      btn("btn-green","✅ שמור דייר",()=>{
-        if(!data.name||!data.startDate||!data.rent) return alert("נא למלא שם, תאריך כניסה וסכום שכ\"ד");
-        onSave({...data,id:uid(),status:"active",rent:Number(data.rent),vaad:Number(data.vaad||0),deposit:Number(data.deposit||0)});
+    const dr=D("row");
+    const ni=Inp("text",dName,v=>{dName=v;},"שם המסמך");ni.style.width="150px";
+    const ui=Inp("text",dUrl,v=>{dUrl=v;},"קישור URL");
+    dr.appendChild(ni);dr.appendChild(ui);
+    dr.appendChild(Btn("gray sm","+ הוסף",()=>{
+      if(!dName.trim()||!dUrl.trim())return;
+      d.docs.push({id:uid(),name:dName.trim(),url:dUrl.trim()});
+      dName="";dUrl="";build();
+    }));
+    wrap.appendChild(dr);
+    wrap.appendChild(ce("hr",{cls:"sep"}));
+    wrap.appendChild(D("row",[
+      Btn("green","✅ שמור",()=>{
+        if(!d.name||!d.startDate||!d.rent)return alert("חובה: שם, תאריך כניסה, שכ\"ד");
+        onSave({...d,id:d.id||uid(),status:d.status||"active",
+                rent:Number(d.rent)||0,vaad:Number(d.vaad)||0,deposit:Number(d.deposit)||0});
       }),
-      btn("","ביטול",closeModal)
-    ]);
-    wrapper.appendChild(btns);
+      Btn("gray","ביטול",closeModal)
+    ]));
   }
-  rebuild();
-  return wrapper;
+  build();return wrap;
 }
 
-// ── Edit tenant form ──
-function buildEditTenantForm(tenant, onSave){
-  let data={...tenant};
-  let newDocName="", newDocUrl="";
-  const wrapper=div("",[]);
-
-  function rebuild(){
-    wrapper.innerHTML="";
-    const title=div("section-h",["✏️ עריכת פרטי דייר"]);
-    wrapper.appendChild(title);
-    const grid=div("form-grid",[]);
-    const fields=[
-      ["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
-      ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
-      ["תאריך יציאה","endDate","date"],
-      ['שכ"ד ₪',"rent","number"],["ועד בית ₪","vaad","number"],
-      ["פיקדון ₪","deposit","number"],
-    ];
-    fields.forEach(([l,k,t])=>{
-      const input=inp(t,data[k],v=>{data[k]=v;});
-      grid.appendChild(colDiv(l,input));
-    });
-    wrapper.appendChild(grid);
-    const notesDiv=div("",[lbl("הערות"), textarea(data.notes,v=>{data.notes=v;},"")]);
-    notesDiv.style.marginBottom="10px";
-    wrapper.appendChild(notesDiv);
-
-    const docTitle=div("",["📎 קישורי מסמכים"]);
-    docTitle.style.cssText="font-size:13px;font-weight:600;margin-bottom:6px";
-    wrapper.appendChild(docTitle);
-    (data.docs||[]).forEach((doc,i)=>{
-      const row=div("doc-row",[
-        el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
-        btn("btn-red btn-sm","✕",()=>{data.docs=data.docs.filter((_,j)=>j!==i);rebuild();})
-      ]);
-      wrapper.appendChild(row);
-    });
-    const docRow=div("row",[]);
-    const nameInp=inp("text",newDocName,v=>{newDocName=v;},"שם המסמך");
-    nameInp.style.width="160px";
-    const urlInp=inp("text",newDocUrl,v=>{newDocUrl=v;},"קישור (URL)");
-    const addDocBtn=btn("btn-sm","+ הוסף",()=>{
-      if(!newDocName||!newDocUrl) return;
-      if(!data.docs) data.docs=[];
-      data.docs.push({id:uid(),name:newDocName,url:newDocUrl});
-      newDocName=""; newDocUrl=""; rebuild();
-    });
-    docRow.appendChild(nameInp); docRow.appendChild(urlInp); docRow.appendChild(addDocBtn);
-    wrapper.appendChild(docRow);
-
-    const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
-    const btns=div("actions-row",[
-      btn("btn-blue","💾 שמור שינויים",()=>{
-        onSave({...data,rent:Number(data.rent||0),vaad:Number(data.vaad||0),deposit:Number(data.deposit||0)});
-      }),
-      btn("","ביטול",closeModal)
-    ]);
-    wrapper.appendChild(btns);
-  }
-  rebuild();
-  return wrapper;
-}
-
-// ── Close account form ──
-function buildCloseAccountForm(tenant, onSave){
-  let data={endDate:today(),finalNote:"",refundDeposit:false};
-  const wrapper=div("",[]);
-  wrapper.innerHTML="";
-  const title=div("section-h",["🔒 סגירת חשבון — "+tenant.name]);
-  wrapper.appendChild(title);
-  const alert=div("alert alert-yellow",["הדייר יועבר לארכיון. כל הנתונים שלו יישמרו במערכת."]);
-  wrapper.appendChild(alert);
-  const grid=div("form-grid",[
-    colDiv("תאריך יציאה בפועל", inp("date",data.endDate,v=>{data.endDate=v;})),
-    colDiv("הוחזר פיקדון?", sel([["false","לא"],["true","כן"]],data.refundDeposit,v=>{data.refundDeposit=v==="true";})),
+function closeAccountForm(tenant,onSave){
+  let endDate=today(),note="",refund=false;
+  const wrap=D("");
+  wrap.appendChild(ce("h3",{html:"<b>🔒 סגירת חשבון — "+tenant.name+"</b>",style:"margin-bottom:12px;font-size:15px"}));
+  wrap.appendChild(D("alert-y",["כל נתוני הדייר יישמרו בארכיון. לא ניתן לבטל פעולה זו."]));
+  const g=D("grid g2",[
+    Col("תאריך יציאה בפועל",Inp("date",endDate,v=>{endDate=v;})),
+    Col("פיקדון הוחזר?",Sel([["false","לא"],["true","כן"]],refund,v=>{refund=v==="true";}))
   ]);
-  wrapper.appendChild(grid);
-  const noteDiv=div("",[lbl("הערת סיום"), textarea(data.finalNote,v=>{data.finalNote=v;},"פגמים, חובות, הערות...")]);
-  noteDiv.style.marginBottom="10px";
-  wrapper.appendChild(noteDiv);
-  const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
-  const btns=div("actions-row",[
-    btn("btn-orange","🔒 סגור חשבון",()=>{
-      if(!data.endDate) return alert("נא לבחור תאריך יציאה");
-      onSave(data);
+  wrap.appendChild(g);
+  wrap.appendChild(D("",[Lbl("הערת סיום"),Ta(note,v=>{note=v;},"פגמים, חובות, הערות...")]));
+  wrap.appendChild(ce("hr",{cls:"sep"}));
+  wrap.appendChild(D("row",[
+    Btn("orange","🔒 סגור חשבון",()=>{
+      if(!endDate)return alert("נא לבחור תאריך יציאה");
+      onSave({endDate,note,refund});
     }),
-    btn("","ביטול",closeModal)
-  ]);
-  wrapper.appendChild(btns);
-  return wrapper;
+    Btn("gray","ביטול",closeModal)
+  ]));
+  return wrap;
 }
 
-// ── Asset Manager ──
-function renderAssetManager(assets, type){
-  const isApt=type==="apt", typeLabel=isApt?"דירה":"מחסן";
-  const floorOpts=isApt?APT_FLOORS:STOR_FLOORS;
-  const tod=today();
-  const fa=state.filterArea[type], ff=state.filterFloor[type];
-  const areas=[...new Set(assets.map(a=>a.area))].sort((a,b)=>a-b);
+// ══ Update helpers ══
+function updAsset(type,id,fn){
+  const key=type==="apt"?"apts":"storages";
+  set({[key]:S[key].map(a=>a.id===id?fn(a):a)});
+}
+
+// ══ Asset Manager ══
+function renderAssets(type){
+  const isApt=type==="apt",lbl=isApt?"דירה":"מחסן";
+  const assets=isApt?S.apts:S.storages;
+  const floors=isApt?APT_FLOORS:STOR_FLOORS;
+  const areas=isApt?APT_AREAS:STOR_AREAS;
+  const fa=S.fArea[type],ff=S.fFloor[type];
+  const allAreas=[...new Set(assets.map(a=>a.area))].sort((a,b)=>a-b);
   const filtered=assets.filter(a=>(fa==="all"||a.area===Number(fa))&&(ff==="all"||a.floor===Number(ff)));
-  const aptNums=state.apts.map(a=>a.number);
-  const wrap=div("",[]);
+  const wrap=D("");
 
-  const frow=div("filter-row",[]);
-  frow.appendChild(colDiv("שטח", sel([["all","הכל"],...areas.map(a=>[a,a+' מ"ר'])],fa,v=>setState({filterArea:{...state.filterArea,[type]:v}},false))));
-  frow.appendChild(colDiv("קומה", sel([["all","הכל"],...floorOpts.map(f=>[f,fmtFloor(f)])],ff,v=>setState({filterFloor:{...state.filterFloor,[type]:v}},false))));
-  const ab=btn("btn-blue","+ הוסף "+typeLabel,()=>setState({showAdd:state.showAdd?false:type,selectedId:null},false));
-  ab.style.marginRight="auto";
-  frow.appendChild(ab);
-  wrap.appendChild(frow);
+  // Filter row
+  const fr=D("row",{style:"margin-bottom:12px"});
+  fr.appendChild(Col("שטח",Sel([["all","הכל"],...allAreas.map(a=>[a,a+' מ"ר'])],fa,v=>set({fArea:{...S.fArea,[type]:v}},false))));
+  fr.appendChild(Col("קומה",Sel([["all","הכל"],...floors.map(f=>[f,fmtFloor(f)])],ff,v=>set({fFloor:{...S.fFloor,[type]:v}},false))));
+  const addBtn=Btn("blue","+ הוסף "+lbl,()=>set({showAdd:S.showAdd===type?null:type,sel:null},false));
+  addBtn.style.marginRight="auto";fr.appendChild(addBtn);
+  wrap.appendChild(fr);
 
-  if(state.showAdd===type){
-    const form=div("form-box",[]);
-    const t=div("section-h",[typeLabel+" חדש"]); form.appendChild(t);
-    const grid=div("form-grid",[]);
-    const na=state.newAsset;
-    grid.appendChild(colDiv("מס' "+typeLabel, inp("text",na.number,v=>setState({newAsset:{...state.newAsset,number:v}},false))));
-    grid.appendChild(colDiv("קומה", sel([["","בחר"],...floorOpts.map(f=>[f,fmtFloor(f)])],na.floor,v=>setState({newAsset:{...state.newAsset,floor:v}},false))));
-    const AREA_OPTIONS_APT = [30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150];
-    const AREA_OPTIONS_STOR = [3,4,5,6,7,8,9,10,12,15,20];
-    const areaOpts = isApt ? AREA_OPTIONS_APT : AREA_OPTIONS_STOR;
-    grid.appendChild(colDiv('שטח מ"ר', sel([["","בחר שטח"],...areaOpts.map(a=>[a,a+' מ"ר'])],na.area,v=>setState({newAsset:{...state.newAsset,area:v}},false))));
-    if(isApt) grid.appendChild(colDiv('מרפסת מ"ר', inp("number",na.balcony,v=>setState({newAsset:{...state.newAsset,balcony:v}},false))));
-    else grid.appendChild(colDiv("קשור לדירה", sel([["","ללא"],...aptNums.map(n=>[n,"דירה "+n])],na.linkedApt,v=>setState({newAsset:{...state.newAsset,linkedApt:v}},false))));
-    form.appendChild(grid);
-    const brow=div("row",[
-      btn("btn-blue","שמור",()=>{
-        const na=state.newAsset;
-        if(!na.number||na.floor===""||!na.area) return alert("נא למלא מספר, קומה ושטח");
-        const item={id:uid(),number:na.number,floor:Number(na.floor),area:Number(na.area),balcony:Number(na.balcony||0),linkedApt:na.linkedApt||"",tenants:[]};
-        if(isApt) setState({apts:[...state.apts,item],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
-        else setState({storages:[...state.storages,item],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
-      }),
-      btn("","ביטול",()=>setState({showAdd:false},false))
+  // Add form
+  if(S.showAdd===type){
+    const fp=D("form-panel");
+    fp.appendChild(ce("p",{cls:"lbl",style:"font-size:14px;font-weight:700;margin-bottom:10px",txt:lbl+" חדש"}));
+    const na=S.newA;
+    const g=D("grid g3",[
+      Col("מס' "+lbl,Inp("text",na.number,v=>set({newA:{...S.newA,number:v}},false))),
+      Col("קומה",Sel([["","בחר"],...floors.map(f=>[f,fmtFloor(f)])],na.floor,v=>set({newA:{...S.newA,floor:v}},false))),
+      Col('שטח מ"ר',Sel([["","בחר"],...areas.map(a=>[a,a+' מ"ר'])],na.area,v=>set({newA:{...S.newA,area:v}},false))),
     ]);
-    form.appendChild(brow); wrap.appendChild(form);
+    if(isApt) g.appendChild(Col('מרפסת מ"ר',Sel([[0,"ללא"],...BALCONIES.filter(b=>b>0).map(b=>[b,b+' מ"ר'])],na.balcony,v=>set({newA:{...S.newA,balcony:v}},false))));
+    else g.appendChild(Col("קשור לדירה",Sel([["","ללא"],...S.apts.map(a=>[a.number,"דירה "+a.number])],na.linkedApt,v=>set({newA:{...S.newA,linkedApt:v}},false))));
+    fp.appendChild(g);
+    fp.appendChild(D("row",[
+      Btn("blue","שמור",()=>{
+        const n=S.newA;
+        if(!n.number||n.floor===""||!n.area)return alert("חובה: מספר, קומה, שטח");
+        const item={id:uid(),number:n.number,floor:Number(n.floor),area:Number(n.area),
+                    balcony:Number(n.balcony||0),linkedApt:n.linkedApt||"",tenants:[]};
+        const key=isApt?"apts":"storages";
+        set({[key]:[...S[key],item],showAdd:null,newA:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
+      }),
+      Btn("gray","ביטול",()=>set({showAdd:null},false))
+    ]));
+    wrap.appendChild(fp);
   }
 
-  if(filtered.length===0){
-    const em=div("empty",["אין "+typeLabel+"ות עדיין. לחץ '+ הוסף "+typeLabel+"' כדי להתחיל."]);
-    wrap.appendChild(em);
-  }
+  if(filtered.length===0){wrap.appendChild(D("empty",["אין "+lbl+"ות. לחץ '+ הוסף "+lbl+"' להתחלה."]));return wrap;}
 
+  // Asset cards
   filtered.forEach(asset=>{
-    const activeTenant=getActiveTenant(asset);
-    const occ=calcOcc(asset,state.reportFrom,state.reportTo);
-    const isSel=state.selectedId===asset.id;
-    const tenants=asset.tenants||[];
-    const card=div("card asset-card"+(isSel?" sel":""),[]);
-    card.onclick=()=>setState({selectedId:isSel?null:asset.id,showAdd:false},false);
+    const at=getActive(asset);
+    const isSel=S.sel===asset.id;
+    const card=D("card"+(isSel?" sel":""));
+    card.onclick=()=>set({sel:isSel?null:asset.id,showAdd:null},false);
 
     // Header
-    const head=div("asset-head",[]);
-    const nb=div("num-box",[asset.number]); head.appendChild(nb);
-    const info=div("info",[]);
-    const main=div("info-main",[]);
-    const nameSpan=el("span",{style:{fontWeight:"600",fontSize:"15px"}},[typeLabel+" "+asset.number]);
-    main.appendChild(nameSpan);
-    main.appendChild(badge("b-gray",fmtFloor(asset.floor)));
-    main.appendChild(badge("b-gray",asset.area+' מ"ר'));
-    if(isApt&&asset.balcony>0) main.appendChild(badge("b-gray","מרפסת "+asset.balcony+' מ"ר'));
-    if(!isApt&&asset.linkedApt) main.appendChild(badge("b-gray","דירה "+asset.linkedApt));
-    if(activeTenant) main.appendChild(badge("b-green","מושכר"));
-    else main.appendChild(badge("b-yellow","פנוי"));
-    info.appendChild(main);
-    const sub=div("info-sub",[]);
-    if(activeTenant){
-      sub.textContent=activeTenant.name+(activeTenant.phone?" | "+activeTenant.phone:"")+" | ₪"+Number(activeTenant.rent).toLocaleString()+(isApt&&activeTenant.vaad?" + ועד ₪"+activeTenant.vaad:"")+" | כניסה: "+fmtDate(activeTenant.startDate);
-    } else {
-      sub.textContent="אין דייר פעיל · היסטוריה: "+tenants.length+" דיירים";
-    }
-    info.appendChild(sub); head.appendChild(info);
-    const acts=div("",[ btn("btn-red btn-sm","מחק",e=>{e.stopPropagation();if(confirm("למחוק "+typeLabel+" "+asset.number+"?")){if(isApt)setState({apts:state.apts.filter(a=>a.id!==asset.id),selectedId:null});else setState({storages:state.storages.filter(a=>a.id!==asset.id),selectedId:null});}}) ]);
-    acts.style.flexShrink="0";
-    head.appendChild(acts);
+    const nb=D("",{style:"min-width:46px;height:46px;border-radius:8px;background:#e8edf5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;color:#1e3a5f"});
+    nb.textContent=asset.number;
+    const info=D("",{style:"flex:1;min-width:0"});
+    const top=D("flex",{style:"flex-wrap:wrap;gap:6px;margin-bottom:4px"});
+    top.appendChild(ce("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f",txt:lbl+" "+asset.number}));
+    top.appendChild(Bdg("bgr",fmtFloor(asset.floor)));
+    top.appendChild(Bdg("bgr",asset.area+' מ"ר'));
+    if(isApt&&asset.balcony>0)top.appendChild(Bdg("bgr","מרפסת "+asset.balcony+' מ"ר'));
+    if(!isApt&&asset.linkedApt)top.appendChild(Bdg("bb","דירה "+asset.linkedApt));
+    top.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
+    info.appendChild(top);
+    const sub=D("muted");
+    sub.textContent=at?at.name+(at.phone?" · "+at.phone:"")+" · ₪"+Number(at.rent).toLocaleString()+" · כניסה "+fmtDate(at.startDate):"אין דייר פעיל · "+((asset.tenants||[]).length)+" דיירים בהיסטוריה";
+    info.appendChild(sub);
+    const head=D("flex",{style:"gap:10px;align-items:center"});
+    head.appendChild(nb);head.appendChild(info);
+    head.appendChild(Btn("red sm","🗑",e=>{e.stopPropagation();if(confirm("למחוק "+lbl+" "+asset.number+"?")){const k=isApt?"apts":"storages";set({[k]:S[k].filter(a=>a.id!==asset.id),sel:null});}}));
     card.appendChild(head);
 
     // Detail
     if(isSel){
-      const det=div("detail",[]); det.onclick=e=>e.stopPropagation();
-
-      // Add tenant button
-      const addTenantBtn=btn("btn-green","+ הוסף דייר חדש",()=>{
-        showModal(buildNewTenantForm(asset.id, isApt, (newTenant)=>{
-          // archive current active if exists
-          let updatedTenants=tenants.map(t=>t.status==="active"?{...t,status:"archived"}:t);
-          updatedTenants=[...updatedTenants, newTenant];
-          const setter=isApt?setApts:setStorages;
-          setter(asset.id, updatedTenants);
+      const det=D("",{style:"border-top:1px solid #e5e7eb;margin-top:12px;padding-top:12px"});
+      det.onclick=e=>e.stopPropagation();
+      det.appendChild(Btn("green","+ הוסף דייר חדש",()=>{
+        openModal(tenantForm({},"➕ דייר חדש — "+lbl+" "+asset.number,newT=>{
+          const current=(asset.tenants||[]).map(t=>t.status==="active"?{...t,status:"archived"}:t);
+          updAsset(type,asset.id,a=>({...a,tenants:[...current,newT]}));
           closeModal();
         }));
+      }));
+
+      const tenants=[...(asset.tenants||[])].sort((a,b)=>{
+        if(a.status==="active")return -1;if(b.status==="active")return 1;
+        return (b.startDate||"").localeCompare(a.startDate||"");
       });
-      det.appendChild(addTenantBtn);
 
-      if(tenants.length===0){
-        const em=div("empty",["אין דיירים עדיין"]); em.style.marginTop="10px"; det.appendChild(em);
-      }
+      if(tenants.length===0)det.appendChild(D("empty",["אין דיירים עדיין"]));
 
-      // Show active tenant first, then archived
-      const sorted=[...tenants].sort((a,b)=>{ if(a.status==="active") return -1; if(b.status==="active") return 1; return (b.startDate||"").localeCompare(a.startDate||""); });
-
-      sorted.forEach((tenant,i)=>{
-        const isActive=tenant.status==="active";
-        const expandKey=asset.id+"_"+tenant.id;
-        const isOpen=!!state.expandedTenant[expandKey];
-
-        const tc=div("tenant-card"+(isActive?" active-tenant":" archived-tenant"),[]);
-        tc.style.marginTop="10px";
+      tenants.forEach(t=>{
+        const isActive=t.status==="active";
+        const key=asset.id+"_"+t.id;
+        const isOpen=!!S.expanded[key];
+        const tc=D("t-card"+(isActive?" active":" arch"));
 
         // Tenant header
-        const th=div("tenant-header",[]);
-        th.onclick=()=>{
-          const exp={...state.expandedTenant};
-          exp[expandKey]=!exp[expandKey];
-          setState({expandedTenant:exp},false);
-        };
-        const tLeft=div("",[]);
-        tLeft.style.cssText="display:flex;gap:8px;align-items:center";
-        tLeft.appendChild(el("span",{style:{fontWeight:"600"}},[tenant.name||"ללא שם"]));
-        tLeft.appendChild(tenantStatusBadge(tenant));
-        if(tenant.startDate){
-          const dates=el("span",{style:{fontSize:"12px",color:"#666"}},[fmtDate(tenant.startDate)+(tenant.endDate?" — "+fmtDate(tenant.endDate):"")]);
-          tLeft.appendChild(dates);
-        }
-        th.appendChild(tLeft);
-        const tRight=div("",[]);
-        tRight.style.cssText="display:flex;gap:6px;align-items:center";
-        if(tenant.rent) tRight.appendChild(el("span",{style:{fontSize:"13px",fontWeight:"600"}},["₪"+Number(tenant.rent).toLocaleString()]));
-        tRight.appendChild(el("span",{style:{fontSize:"16px",color:"#666"}},[isOpen?"▲":"▼"]));
-        th.appendChild(tRight);
-        tc.appendChild(th);
+        const th=D("t-head");
+        th.onclick=()=>{const ex={...S.expanded};ex[key]=!ex[key];set({expanded:ex},false);};
+        const tl=D("flex",{style:"flex:1;flex-wrap:wrap;gap:6px;min-width:0"});
+        tl.appendChild(ce("span",{style:"font-weight:600",txt:t.name||"ללא שם"}));
+        tl.appendChild(isActive?Bdg("bg","פעיל"):Bdg("bgr","ארכיון"));
+        if(t.startDate)tl.appendChild(ce("span",{cls:"muted",txt:fmtDate(t.startDate)+(t.endDate?" — "+fmtDate(t.endDate):"")}));
+        th.appendChild(tl);
+        const tr2=D("flex");
+        if(t.rent)tr2.appendChild(ce("span",{style:"font-weight:700;font-size:14px;color:#1e3a5f",txt:"₪"+Number(t.rent).toLocaleString()}));
+        tr2.appendChild(ce("span",{style:"color:#999;font-size:14px",txt:isOpen?"▲":"▼"}));
+        th.appendChild(tr2);tc.appendChild(th);
 
         // Tenant body
-        const tb=div("tenant-body"+(isOpen?" open":""),[]);
-
-        // Fields grid
-        const fg=div("form-grid",[]);
-        const infoFields=[
-          ["טלפון",tenant.phone||"—"],["אימייל",tenant.email||"—"],
-          ["תעודת זהות",tenant.idNum||"—"],["פיקדון","₪"+Number(tenant.deposit||0).toLocaleString()],
-          ['שכ"ד',"₪"+Number(tenant.rent||0).toLocaleString()],
-          ...(isApt?[["ועד בית","₪"+Number(tenant.vaad||0).toLocaleString()]]:[]),
-          ["כניסה",fmtDate(tenant.startDate)],["יציאה",tenant.endDate?fmtDate(tenant.endDate):"—"],
-          ["משך",tenant.startDate?monthsBetween(tenant.startDate,tenant.endDate||today())+" חודשים":"—"],
-        ];
-        infoFields.forEach(([l,v])=>{
-          const cell=div("cmp-cell",[]);
-          cell.innerHTML="<div class='cmp-lbl'>"+l+"</div><div class='cmp-val'>"+v+"</div>";
-          fg.appendChild(cell);
+        const tb=D("t-body"+(isOpen?" open":""));
+        const ig=D("grid g3",{style:"margin-bottom:10px"});
+        [["טלפון",t.phone||"—"],["אימייל",t.email||"—"],["ת.ז.",t.idNum||"—"],
+         ["פיקדון","₪"+Number(t.deposit||0).toLocaleString()],
+         ['שכ"ד',"₪"+Number(t.rent||0).toLocaleString()],
+         ["ועד","₪"+Number(t.vaad||0).toLocaleString()],
+         ["כניסה",fmtDate(t.startDate)],["יציאה",t.endDate?fmtDate(t.endDate):"—"],
+         ["משך",t.startDate?monthsBetween(t.startDate,t.endDate||today())+" חודשים":"—"]
+        ].forEach(([l,v])=>{
+          const c=D("info-cell");c.innerHTML="<div class='cl'>"+l+"</div><div class='cv'>"+v+"</div>";
+          ig.appendChild(c);
         });
-        tb.appendChild(fg);
+        tb.appendChild(ig);
 
-        if(tenant.notes){
-          const noteDiv=div("",[]);
-          noteDiv.style.cssText="background:#fafafa;border-radius:6px;padding:8px 10px;font-size:12px;color:#444;margin-bottom:8px";
-          noteDiv.textContent="📝 "+tenant.notes;
-          tb.appendChild(noteDiv);
-        }
+        if(t.notes){const nd=D("",{style:"background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:12px;margin-bottom:8px"});nd.textContent="📝 "+t.notes;tb.appendChild(nd);}
+        if(t.note){const fn=D("",{style:"background:#fff7ed;border-radius:6px;padding:8px 10px;font-size:12px;margin-bottom:8px;color:#92400e"});fn.textContent="🔒 הערת סיום: "+t.note+(t.refund?" · פיקדון הוחזר":"");tb.appendChild(fn);}
 
-        if(tenant.finalNote){
-          const fnDiv=div("",[]);
-          fnDiv.style.cssText="background:#fff7ed;border-radius:6px;padding:8px 10px;font-size:12px;color:#92400e;margin-bottom:8px";
-          fnDiv.textContent="🔒 סיום: "+tenant.finalNote+(tenant.refundDeposit?" | פיקדון הוחזר":"");
-          tb.appendChild(fnDiv);
-        }
-
-        // Documents
-        const docs=tenant.docs||[];
-        if(docs.length>0){
-          const docTitle=div("",["📎 מסמכים"]);
-          docTitle.style.cssText="font-size:12px;font-weight:600;margin-bottom:5px";
-          tb.appendChild(docTitle);
-          docs.forEach(doc=>{
-            const row=div("doc-row",[
-              el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
-              el("span",{style:{fontSize:"11px",color:"#999"}},["↗"])
-            ]);
-            tb.appendChild(row);
+        if((t.docs||[]).length>0){
+          tb.appendChild(ce("p",{cls:"lbl",style:"margin-bottom:5px",txt:"📎 מסמכים"}));
+          (t.docs||[]).forEach(doc=>{
+            tb.appendChild(D("doc-row",[
+              ce("a",{cls:"doc-link",href:doc.url,target:"_blank",txt:doc.name}),
+              ce("span",{cls:"muted",txt:"↗"})
+            ]));
           });
         }
 
-        // Action buttons
-        const abRow=div("actions-row",[]);
-        abRow.style.marginTop="10px";
-        abRow.appendChild(btn("btn-sm","✏️ ערוך",()=>{
-          showModal(buildEditTenantForm(tenant,(updated)=>{
-            updateTenant(asset.id, tenant.id, updated, isApt);
+        const ab=D("actions");
+        ab.appendChild(Btn("gray sm","✏️ ערוך",()=>{
+          openModal(tenantForm(t,"✏️ עריכת דייר — "+t.name,updated=>{
+            updAsset(type,asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id?updated:x)}));
             closeModal();
           }));
         }));
         if(isActive){
-          abRow.appendChild(btn("btn-orange btn-sm","🔒 סגור חשבון",()=>{
-            showModal(buildCloseAccountForm(tenant,(closeData)=>{
-              updateTenant(asset.id, tenant.id, {...tenant, status:"archived", endDate:closeData.endDate, finalNote:closeData.finalNote, refundDeposit:closeData.refundDeposit}, isApt);
+          ab.appendChild(Btn("orange sm","🔒 סגור חשבון",()=>{
+            openModal(closeAccountForm(t,data=>{
+              updAsset(type,asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id?{...t,status:"archived",endDate:data.endDate,note:data.note,refund:data.refund}:x)}));
               closeModal();
             }));
           }));
         }
-        abRow.appendChild(btn("btn-red btn-sm","מחק",()=>{
+        ab.appendChild(Btn("red sm","🗑 מחק",()=>{
           if(confirm("למחוק דייר זה לצמיתות?")){
-            removeTenant(asset.id, tenant.id, isApt);
+            updAsset(type,asset.id,a=>({...a,tenants:a.tenants.filter(x=>x.id!==t.id)}));
           }
         }));
-        tb.appendChild(abRow);
-        tc.appendChild(tb);
-        det.appendChild(tc);
+        tb.appendChild(ab);tc.appendChild(tb);det.appendChild(tc);
       });
-
       card.appendChild(det);
     }
     wrap.appendChild(card);
@@ -589,130 +418,117 @@ function renderAssetManager(assets, type){
   return wrap;
 }
 
-function setApts(assetId, newTenants){
-  setState({apts:state.apts.map(a=>a.id===assetId?{...a,tenants:newTenants}:a)});
-}
-function setStorages(assetId, newTenants){
-  setState({storages:state.storages.map(a=>a.id===assetId?{...a,tenants:newTenants}:a)});
-}
-function updateTenant(assetId, tenantId, updated, isApt){
-  const setter=isApt?setApts:setStorages;
-  const asset=(isApt?state.apts:state.storages).find(a=>a.id===assetId);
-  setter(assetId, (asset.tenants||[]).map(t=>t.id===tenantId?updated:t));
-}
-function removeTenant(assetId, tenantId, isApt){
-  const setter=isApt?setApts:setStorages;
-  const asset=(isApt?state.apts:state.storages).find(a=>a.id===assetId);
-  setter(assetId, (asset.tenants||[]).filter(t=>t.id!==tenantId));
-}
-
-// ── Report ──
+// ══ Report ══
 function renderReport(){
-  const tod=today(); const wrap=div("",[]);
-  const frow=div("row",[
-    colDiv("מתאריך",inp("date",state.reportFrom,v=>setState({reportFrom:v},false))),
-    colDiv("עד תאריך",inp("date",state.reportTo,v=>setState({reportTo:v},false)))
-  ]);
-  frow.style.marginBottom="16px";
-  wrap.appendChild(frow);
-
-  const aptAct=state.apts.filter(a=>getActiveTenant(a)).length;
-  const storAct=state.storages.filter(a=>getActiveTenant(a)).length;
-  const aptOcc=state.apts.length?Math.round(state.apts.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/state.apts.length):0;
-  const storOcc=state.storages.length?Math.round(state.storages.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/state.storages.length):0;
-  const aptInc=state.apts.reduce((s,a)=>{const t=getActiveTenant(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
-  const storInc=state.storages.reduce((s,a)=>{const t=getActiveTenant(a);return s+(t?Number(t.rent||0):0);},0);
-
-  const mg=div("metrics",[]);
-  [[aptAct+"/"+state.apts.length,"דירות מושכרות"],[storAct+"/"+state.storages.length,"מחסנים מושכרים"],[aptOcc+"%","תפוסה דירות"],[storOcc+"%","תפוסה מחסנים"],["₪"+aptInc.toLocaleString(),"הכנסה דירות"],["₪"+storInc.toLocaleString(),"הכנסה מחסנים"],["₪"+(aptInc+storInc).toLocaleString(),'סה"כ חודשי']].forEach(([v,l])=>{
-    const m=div("metric",[]); m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>"; mg.appendChild(m);
-  });
+  const tod=today(),wrap=D("");
+  const fr=D("row",{style:"margin-bottom:16px"});
+  fr.appendChild(Col("מתאריך",Inp("date",S.repFrom,v=>set({repFrom:v},false))));
+  fr.appendChild(Col("עד תאריך",Inp("date",S.repTo,v=>set({repTo:v},false))));
+  wrap.appendChild(fr);
+  const aAct=S.apts.filter(a=>getActive(a)).length;
+  const sAct=S.storages.filter(a=>getActive(a)).length;
+  const aOcc=S.apts.length?Math.round(S.apts.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/S.apts.length):0;
+  const sOcc=S.storages.length?Math.round(S.storages.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/S.storages.length):0;
+  const aInc=S.apts.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
+  const sInc=S.storages.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0):0);},0);
+  const mg=D("metric-grid");
+  [[aAct+"/"+S.apts.length,"דירות מושכרות"],[sAct+"/"+S.storages.length,"מחסנים מושכרים"],
+   [aOcc+"%","תפוסה דירות"],[sOcc+"%","תפוסה מחסנים"],
+   ["₪"+aInc.toLocaleString(),"הכנסה דירות"],["₪"+sInc.toLocaleString(),"הכנסה מחסנים"],
+   ["₪"+(aInc+sInc).toLocaleString(),'סה"כ חודשי']
+  ].forEach(([v,l])=>{const m=D("metric");m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>";mg.appendChild(m);});
   wrap.appendChild(mg);
 
-  [{assets:state.apts,label:"דירות",isApt:true},{assets:state.storages,label:"מחסנים",isApt:false}].forEach(({assets,label,isApt})=>{
-    const sh=div("section-h",[label]); wrap.appendChild(sh);
-    const ow=div("ov",[]);
-    const tbl=document.createElement("table");
-    const heads=[isApt?"דירה":"מחסן","קומה","שטח","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"].filter(Boolean);
+  [{assets:S.apts,lbl:"דירות",isApt:true},{assets:S.storages,lbl:"מחסנים",isApt:false}].forEach(({assets,lbl,isApt})=>{
+    wrap.appendChild(ce("p",{style:"font-weight:700;font-size:14px;margin-bottom:8px",txt:lbl}));
+    const ow=D("ov");const tbl=document.createElement("table");
+    const heads=[isApt?"דירה":"מחסן","קומה","שטח","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"];
     tbl.innerHTML="<thead><tr>"+heads.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead>";
     const tb=document.createElement("tbody");
     assets.forEach(a=>{
-      const at=getActiveTenant(a); const occ=calcOcc(a,state.reportFrom,state.reportTo);
-      const occColor=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
+      const at=getActive(a);const occ=calcOcc(a,S.repFrom,S.repTo);
+      const oc=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
       const tr=document.createElement("tr");
-      const cells=["<strong>"+a.number+"</strong>",fmtFloor(a.floor),a.area+' מ"ר',at?at.name:"<span style='color:#aaa'>פנוי</span>",at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"—"):"—",at?"₪"+Number(at.rent).toLocaleString():"—","<span style='color:"+occColor+";font-weight:600'>"+occ+"%</span>",(a.tenants||[]).length+" דיירים"];
-      tr.innerHTML=cells.map(c=>"<td>"+c+"</td>").join(""); tb.appendChild(tr);
+      tr.innerHTML=["<strong>"+a.number+"</strong>",fmtFloor(a.floor),a.area+' מ"ר',
+        at?at.name:"<span style='color:#aaa'>פנוי</span>",
+        at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"פעיל"):"—",
+        at?"₪"+Number(at.rent).toLocaleString():"—",
+        "<span style='color:"+oc+";font-weight:700'>"+occ+"%</span>",
+        (a.tenants||[]).length+" דיירים"
+      ].map(c=>"<td>"+c+"</td>").join("");
+      tb.appendChild(tr);
     });
-    tbl.appendChild(tb); ow.appendChild(tbl); wrap.appendChild(ow);
+    tbl.appendChild(tb);ow.appendChild(tbl);wrap.appendChild(ow);
   });
   return wrap;
 }
 
-// ── Compare ──
+// ══ Compare ══
 function renderCompare(){
-  const tod=today(); const wrap=div("",[]);
-  const frow=div("row",[
-    colDiv("סוג נכס",sel([["apt","דירות"],["stor","מחסנים"]],state.compareType,v=>setState({compareType:v,compareArea:"all"},false))),
-  ]);
-  const src=state.compareType==="apt"?state.apts:state.storages;
+  const wrap=D("");
+  const fr=D("row",{style:"margin-bottom:16px"});
+  fr.appendChild(Col("סוג נכס",Sel([["apt","דירות"],["stor","מחסנים"]],S.cmpType,v=>set({cmpType:v,cmpArea:"all"},false))));
+  const src=S.cmpType==="apt"?S.apts:S.storages;
   const areas=[...new Set(src.map(a=>a.area))].sort((a,b)=>a-b);
-  frow.appendChild(colDiv("שטח",sel([["all","כל הגדלים"],...areas.map(a=>[a,a+' מ"ר'])],state.compareArea,v=>setState({compareArea:v},false))));
-  frow.style.marginBottom="16px";
-  wrap.appendChild(frow);
-
-  const assets=state.compareArea==="all"?src:src.filter(a=>a.area===Number(state.compareArea));
-  const isApt=state.compareType==="apt";
-  const activeAssets=assets.filter(a=>getActiveTenant(a));
-
-  if(activeAssets.length>0){
-    const ab=div("avg-box",[]);
-    ab.style.cssText="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px";
-    const at=div("section-h",["ממוצעים — "+(isApt?"דירות":"מחסנים")+(state.compareArea!=="all"?" "+state.compareArea+' מ"ר':"")]);
-    ab.appendChild(at);
-    const amg=div("metrics",[]); const n=activeAssets.length||1;
-    [["₪"+Math.round(activeAssets.reduce((s,a)=>s+Number(getActiveTenant(a).rent||0),0)/n).toLocaleString(),'שכ"ד ממוצע'],["₪"+(activeAssets.reduce((s,a)=>s+Number(getActiveTenant(a).rent||0)/a.area,0)/n).toFixed(0),'₪/מ"ר ממוצע'],[Math.round(assets.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/(assets.length||1))+"%","תפוסה ממוצעת"]].forEach(([v,l])=>{
-      const m=div("metric",[]); m.innerHTML="<div class='v' style='font-size:18px'>"+v+"</div><div class='l'>"+l+"</div>"; amg.appendChild(m);
-    });
-    ab.appendChild(amg); wrap.appendChild(ab);
+  fr.appendChild(Col("שטח",Sel([["all","כל הגדלים"],...areas.map(a=>[a,a+' מ"ר'])],S.cmpArea,v=>set({cmpArea:v},false))));
+  wrap.appendChild(fr);
+  const assets=S.cmpArea==="all"?src:src.filter(a=>a.area===Number(S.cmpArea));
+  const isApt=S.cmpType==="apt";
+  const active=assets.filter(a=>getActive(a));
+  if(active.length>0){
+    const ab=D("",{style:"background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px"});
+    ab.appendChild(ce("p",{style:"font-weight:700;margin-bottom:10px",txt:"ממוצעים — "+(isApt?"דירות":"מחסנים")+(S.cmpArea!=="all"?" "+S.cmpArea+' מ"ר':"")}));
+    const n=active.length;
+    const mg=D("metric-grid");
+    [["₪"+Math.round(active.reduce((s,a)=>s+Number(getActive(a).rent||0),0)/n).toLocaleString(),'שכ"ד ממוצע'],
+     ["₪"+(active.reduce((s,a)=>s+Number(getActive(a).rent||0)/a.area,0)/n).toFixed(0),'₪/מ"ר ממוצע'],
+     [Math.round(assets.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/(assets.length||1))+"%","תפוסה ממוצעת"]
+    ].forEach(([v,l])=>{const m=D("metric");m.innerHTML="<div class='v' style='font-size:17px'>"+v+"</div><div class='l'>"+l+"</div>";mg.appendChild(m);});
+    ab.appendChild(mg);wrap.appendChild(ab);
   }
-
-  const cg=div("cmp-grid",[]);
+  const cg=D("",{style:"display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"});
+  if(assets.length===0)cg.appendChild(D("empty",["אין נכסים להשוות"]));
   assets.forEach(a=>{
-    const at=getActiveTenant(a); const occ=calcOcc(a,state.reportFrom,state.reportTo);
-    const cc=div("cmp-card",[]);
-    const ch=div("",[]); ch.style.cssText="display:flex;justify-content:space-between;margin-bottom:6px;font-weight:600;font-size:15px";
-    ch.appendChild(el("span",{},[(isApt?"דירה":"מחסן")+" "+a.number]));
-    ch.appendChild(at?badge("b-green","מושכר"):badge("b-yellow","פנוי"));
+    const at=getActive(a);const occ=calcOcc(a,S.repFrom,S.repTo);
+    const cc=D("card");
+    const ch=D("flex-between",{style:"margin-bottom:8px"});
+    ch.appendChild(ce("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f",txt:(isApt?"דירה":"מחסן")+" "+a.number}));
+    ch.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
     cc.appendChild(ch);
-    if(at){const nt=div("",[]); nt.style.cssText="font-size:12px;color:#666;margin-bottom:8px"; nt.textContent=at.name; cc.appendChild(nt);}
-    const rows=[["קומה",fmtFloor(a.floor)],["שטח",a.area+' מ"ר'],...(isApt&&a.balcony>0?[["מרפסת",a.balcony+' מ"ר']]:[]),...(!isApt&&a.linkedApt?[["דירה קשורה",a.linkedApt]]:[]),['שכ"ד',at?"₪"+Number(at.rent).toLocaleString():"פנוי"],['₪/מ"ר',at?"₪"+(Number(at.rent)/a.area).toFixed(0):"—"],["תפוסה",occ+"%"],["דיירים",(a.tenants||[]).length]];
-    const rg=div("cmp-rows",[]);
-    rows.forEach(([l,v])=>{const rc=div("cmp-cell",[]); rc.innerHTML="<div class='cmp-lbl'>"+l+"</div><div class='cmp-val'>"+v+"</div>"; rg.appendChild(rc);});
-    cc.appendChild(rg); cg.appendChild(cc);
+    if(at)cc.appendChild(ce("p",{cls:"muted",style:"margin-bottom:8px",txt:at.name}));
+    const rg=D("",{style:"display:grid;grid-template-columns:1fr 1fr;gap:5px"});
+    [["קומה",fmtFloor(a.floor)],["שטח",a.area+' מ"ר'],
+     ...(isApt&&a.balcony>0?[["מרפסת",a.balcony+' מ"ר']]:[]),
+     ...((!isApt&&a.linkedApt)?[["דירה",a.linkedApt]]:[]),
+     ['שכ"ד',at?"₪"+Number(at.rent).toLocaleString():"פנוי"],
+     ['₪/מ"ר',at?"₪"+(Number(at.rent)/a.area).toFixed(0):"—"],
+     ["תפוסה",occ+"%"],["דיירים",(a.tenants||[]).length]
+    ].forEach(([l,v])=>{const c=D("info-cell");c.innerHTML="<div class='cl'>"+l+"</div><div class='cv'>"+v+"</div>";rg.appendChild(c);});
+    cc.appendChild(rg);cg.appendChild(cc);
   });
-  if(assets.length===0){const em=div("",["אין נכסים להשוות"]); em.style.color="#aaa"; cg.appendChild(em);}
-  wrap.appendChild(cg); return wrap;
+  wrap.appendChild(cg);return wrap;
 }
 
-// ── Render ──
+// ══ Render ══
 function render(){
   const tabsEl=document.getElementById("tabs");
   tabsEl.innerHTML="";
-  TABS.forEach(t=>{const b=document.createElement("button");b.className="tab"+(state.tab===t?" on":"");b.textContent=t;b.onclick=()=>setState({tab:t,showAdd:false,selectedId:null},false);tabsEl.appendChild(b);});
-  const app=document.getElementById("app"); app.innerHTML="";
-  if(state.tab==="דירות") app.appendChild(renderAssetManager(state.apts,"apt"));
-  else if(state.tab==="מחסנים") app.appendChild(renderAssetManager(state.storages,"stor"));
-  else if(state.tab==="ניתוח") app.appendChild(renderReport());
-  else if(state.tab==="השוואה") app.appendChild(renderCompare());
-  const modal=renderModal(); if(modal) app.appendChild(modal);
+  TABS.forEach(t=>{
+    const b=ce("button",{cls:"tab"+(S.tab===t?" on":""),txt:t,onclick:()=>set({tab:t,showAdd:null,sel:null},false)});
+    tabsEl.appendChild(b);
+  });
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  let content;
+  if(S.tab==="דירות")content=renderAssets("apt");
+  else if(S.tab==="מחסנים")content=renderAssets("stor");
+  else if(S.tab==="ניתוח")content=renderReport();
+  else if(S.tab==="השוואה")content=renderCompare();
+  if(content)app.appendChild(content);
+  const modal=renderModal();if(modal)app.appendChild(modal);
 }
 
-dataRef.on("value",(snapshot)=>{
-  const data=snapshot.val();
-  state.apts=data?.apts||[];
-  state.storages=data?.storages||[];
-  render();
-});
+render();
 </script>
 </body>
 </html>
