@@ -37,6 +37,10 @@ const S = {
   metric: { background:"var(--color-background-secondary)", borderRadius:"var(--border-radius-md)", padding:"12px 16px", textAlign:"center" },
 };
 
+const APT_FLOORS = [0,1,2,3,4,5,6,7];
+const STOR_FLOORS = [-1,-2];
+const fmtFloor = f => f===0?"קומת קרקע":f<0?`מרתף ${Math.abs(f)}`:`קומה ${f}`;
+
 const EMPTY_LEASE = { tenant:"", start:"", end:"", rent:"", vaad:"", notes:"" };
 
 function AssetManager({ assets, setAssets, type, aptNumbers, reportFrom, reportTo, customFieldDefs, updateCustomField }) {
@@ -53,7 +57,7 @@ function AssetManager({ assets, setAssets, type, aptNumbers, reportFrom, reportT
   const [editLease, setEditLease] = useState(null);
 
   const uniqueAreas = useMemo(()=>[...new Set(assets.map(a=>a.area))].sort((a,b)=>a-b),[assets]);
-  const uniqueFloors = useMemo(()=>[...new Set(assets.map(a=>a.floor))].sort((a,b)=>a-b),[assets]);
+  const floorOptions = isApt ? APT_FLOORS : STOR_FLOORS;
   const filtered = useMemo(()=>assets.filter(a=>(filterArea==="all"||a.area===Number(filterArea))&&(filterFloor==="all"||a.floor===Number(filterFloor))),[assets,filterArea,filterFloor]);
 
   const addAsset = () => {
@@ -87,8 +91,8 @@ function AssetManager({ assets, setAssets, type, aptNumbers, reportFrom, reportT
           </select>
         </div>
         <div><span style={S.lbl}>קומה</span>
-          <select value={filterFloor} onChange={e=>setFilterFloor(e.target.value)} style={{...S.input,width:110,cursor:"pointer"}}>
-            <option value="all">הכל</option>{uniqueFloors.map(f=><option key={f} value={f}>{f<0?`מרתף ${Math.abs(f)}`:`קומה ${f}`}</option>)}
+          <select value={filterFloor} onChange={e=>setFilterFloor(e.target.value)} style={{...S.input,width:130,cursor:"pointer"}}>
+            <option value="all">הכל</option>{floorOptions.map(f=><option key={f} value={f}>{fmtFloor(f)}</option>)}
           </select>
         </div>
         <div style={{marginRight:"auto"}}>
@@ -103,7 +107,11 @@ function AssetManager({ assets, setAssets, type, aptNumbers, reportFrom, reportT
           <p style={{fontWeight:500,fontSize:14,margin:"0 0 12px"}}>{typeLabel} חדש</p>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:10,marginBottom:10}}>
             <div><span style={S.lbl}>מס' {typeLabel}</span><input value={newAsset.number} onChange={e=>setNewAsset(p=>({...p,number:e.target.value}))} style={S.input}/></div>
-            <div><span style={S.lbl}>קומה</span><input type="number" value={newAsset.floor} onChange={e=>setNewAsset(p=>({...p,floor:e.target.value}))} style={S.input}/></div>
+            <div><span style={S.lbl}>קומה</span>
+              <select value={newAsset.floor} onChange={e=>setNewAsset(p=>({...p,floor:e.target.value}))} style={{...S.input,cursor:"pointer"}}>
+                <option value="">בחר קומה</option>{floorOptions.map(f=><option key={f} value={f}>{fmtFloor(f)}</option>)}
+              </select>
+            </div>
             <div><span style={S.lbl}>שטח מ"ר</span><input type="number" value={newAsset.area} onChange={e=>setNewAsset(p=>({...p,area:e.target.value}))} style={S.input}/></div>
             {isApt && <div><span style={S.lbl}>מרפסת מ"ר</span><input type="number" value={newAsset.balcony} onChange={e=>setNewAsset(p=>({...p,balcony:e.target.value}))} style={S.input}/></div>}
             {!isApt && <div><span style={S.lbl}>קשור לדירה</span>
@@ -133,7 +141,7 @@ function AssetManager({ assets, setAssets, type, aptNumbers, reportFrom, reportT
               <div style={{flex:1,minWidth:0}}>
                 <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
                   <span style={{fontWeight:500,fontSize:14}}>{typeLabel} {asset.number}</span>
-                  <span style={S.badge("secondary")}>{asset.floor<0?`מרתף ${Math.abs(asset.floor)}`:`קומה ${asset.floor}`}</span>
+                  <span style={S.badge("secondary")}>{fmtFloor(asset.floor)}</span>
                   <span style={S.badge("secondary")}>{asset.area} מ"ר</span>
                   {isApt && asset.balcony>0 && <span style={S.badge("secondary")}>מרפסת {asset.balcony} מ"ר</span>}
                   {!isApt && asset.linkedApt && <span style={S.badge("secondary")}>דירה {asset.linkedApt}</span>}
@@ -340,7 +348,7 @@ export default function App() {
                       const occ=calcOcc(a,reportFrom,reportTo);
                       return <tr key={a.id} style={{borderBottom:"0.5px solid var(--color-border-tertiary)",background:i%2?"var(--color-background-secondary)":"transparent"}}>
                         <td style={{padding:"7px 10px",fontWeight:500}}>{a.number}</td>
-                        <td style={{padding:"7px 10px"}}>{a.floor<0?`מרתף ${Math.abs(a.floor)}`:a.floor}</td>
+                        <td style={{padding:"7px 10px"}}>{fmtFloor(a.floor)}</td>
                         <td style={{padding:"7px 10px"}}>{a.area} מ"ר</td>
                         <td style={{padding:"7px 10px"}}>{isApt?(a.balcony>0?`${a.balcony} מ"ר`:"—"):(a.linkedApt?`דירה ${a.linkedApt}`:"—")}</td>
                         <td style={{padding:"7px 10px"}}>
@@ -411,7 +419,7 @@ export default function App() {
                   {active && <div style={{fontSize:12,color:"var(--color-text-secondary)",marginBottom:8}}>{active.tenant}</div>}
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5}}>
                     {[
-                      ["קומה",a.floor<0?`מרתף ${Math.abs(a.floor)}`:a.floor],
+                      ["קומה",fmtFloor(a.floor)],
                       ["שטח",`${a.area} מ"ר`],
                       ...(isApt&&a.balcony>0?[["מרפסת",`${a.balcony} מ"ר`]]:[]),
                       ...(!isApt&&a.linkedApt?[["דירה קשורה",a.linkedApt]]:[]),
