@@ -7,478 +7,710 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f5f5f5;color:#222;direction:rtl;padding:16px}
-h1{font-size:22px;margin-bottom:4px}
-.sub{color:#888;font-size:13px;margin-bottom:16px}
-.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #ddd}
-.tab{padding:8px 16px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:14px;color:#666;margin-bottom:-2px}
+h1{font-size:22px;margin-bottom:16px}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #ddd;flex-wrap:wrap}
+.tab{padding:8px 16px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:14px;color:#666;margin-bottom:-2px;white-space:nowrap}
 .tab.on{border-bottom-color:#2563eb;color:#2563eb;font-weight:600}
 .card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:10px}
-.card.sel{border-color:#2563eb}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
-.col{display:flex;flex-direction:column;gap:3px}
-label{font-size:12px;color:#666}
-input,select{padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px;font-family:inherit;width:100%}
-input:focus,select:focus{outline:none;border-color:#2563eb}
-.btn{padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#fff;font-size:13px;cursor:pointer;font-family:inherit}
+.card.sel{border-color:#2563eb;border-width:2px}
+.card.archived{opacity:.7;border-style:dashed}
+label,.lbl{font-size:12px;color:#666;display:block;margin-bottom:2px}
+input,select,textarea{padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px;font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb}
+textarea{resize:vertical;min-height:60px}
+.btn{padding:7px 16px;border-radius:6px;border:1px solid #ccc;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:hover{background:#f0f0f0}
 .btn-blue{background:#2563eb;color:#fff;border-color:#2563eb}
 .btn-blue:hover{background:#1d4ed8}
+.btn-green{background:#16a34a;color:#fff;border-color:#16a34a}
+.btn-green:hover{background:#15803d}
 .btn-red{color:#dc2626;border-color:#fca5a5}
 .btn-red:hover{background:#fef2f2}
+.btn-orange{background:#ea580c;color:#fff;border-color:#ea580c}
+.btn-orange:hover{background:#c2410c}
 .btn-sm{padding:4px 10px;font-size:12px}
-.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;white-space:nowrap}
 .b-green{background:#dcfce7;color:#166534}
 .b-yellow{background:#fef9c3;color:#854d0e}
 .b-gray{background:#f3f4f6;color:#4b5563}
 .b-blue{background:#dbeafe;color:#1e40af}
 .b-red{background:#fee2e2;color:#991b1b}
+.b-orange{background:#ffedd5;color:#9a3412}
 .asset-head{display:flex;align-items:center;gap:10px}
-.num-box{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.num-box{min-width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;padding:0 6px}
 .info{flex:1;min-width:0}
-.info-main{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
+.info-main{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
 .info-sub{font-size:12px;color:#666}
-.actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .detail{border-top:1px solid #eee;margin-top:12px;padding-top:12px}
-.lease{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f9f9f9;border-radius:8px;margin-bottom:6px;font-size:13px;border-right:3px solid #ddd}
-.lease.active{border-right-color:#16a34a}
-.lease.exp{border-right-color:#d97706}
-.lease-left{flex:1}
-.lease-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:8px}
-.form-box{background:#f5f5f5;border-radius:8px;padding:10px}
+.section-h{font-weight:600;font-size:14px;margin:0 0 10px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.form-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:10px}
+.form-box.warn{background:#fff7ed;border-color:#fed7aa}
+.tenant-card{border:1px solid #ddd;border-radius:8px;margin-bottom:8px;overflow:hidden}
+.tenant-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f9fafb;cursor:pointer}
+.tenant-body{padding:12px;border-top:1px solid #eee;display:none}
+.tenant-body.open{display:block}
+.tenant-card.active-tenant{border-color:#16a34a;border-width:2px}
+.tenant-card.active-tenant .tenant-header{background:#f0fdf4}
+.tenant-card.archived-tenant{border-color:#d1d5db;opacity:.8}
+.tenant-card.archived-tenant .tenant-header{background:#f9fafb}
+.doc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f9fafb;border-radius:6px;margin-bottom:5px;font-size:13px}
+.doc-link{color:#2563eb;text-decoration:none;font-size:13px}
+.doc-link:hover{text-decoration:underline}
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
 .metric{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center}
-.metric .v{font-size:22px;font-weight:700;margin:4px 0 2px}
+.metric .v{font-size:20px;font-weight:700;margin:4px 0 2px}
 .metric .l{font-size:11px;color:#888}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:6px 10px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #eee;font-size:12px}
-td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+th{padding:6px 10px;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #eee;font-size:12px;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 tr:nth-child(even) td{background:#fafafa}
-.occ{display:flex;align-items:center;gap:5px}
-.bar{width:40px;height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
-.fill{height:100%;border-radius:3px}
 .cmp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .cmp-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px}
 .cmp-rows{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
 .cmp-cell{background:#f5f5f5;border-radius:6px;padding:5px 8px}
 .cmp-lbl{font-size:10px;color:#888}
 .cmp-val{font-size:13px;font-weight:600}
-.avg-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#f3f4f6;border-radius:12px;font-size:12px}
-.empty{font-size:12px;color:#aaa;padding:6px 0}
-.section-h{font-weight:600;font-size:14px;margin:0 0 10px}
-.mb8{margin-bottom:8px}
-.mb16{margin-bottom:16px}
+.saving{position:fixed;bottom:16px;left:16px;background:#1d4ed8;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;z-index:999;display:none}
+.loading{text-align:center;padding:60px;color:#888;font-size:16px}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end}
+.col{display:flex;flex-direction:column;gap:3px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.ov{overflow-x:auto;margin-bottom:24px}
+.empty{font-size:12px;color:#aaa;padding:8px 0}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.alert-yellow{background:#fef9c3;border:1px solid #fde047;color:#713f12}
+.sep{border:none;border-top:1px solid #eee;margin:12px 0}
+.actions-row{display:flex;gap:6px;flex-wrap:wrap}
 </style>
 </head>
 <body>
-
 <h1>🏢 מערכת ניהול בניין</h1>
-<div style="display:flex;justify-content:flex-end;margin-bottom:4px">
-  <button class="btn btn-sm" style="font-size:11px;color:#aaa;border-color:#eee" onclick="if(confirm('למחוק את כל הנתונים ולהתחיל מחדש?')){localStorage.removeItem('building_mgr_v1');location.reload();}">🗑 נקה הכל</button>
-</div>
-
 <div class="tabs" id="tabs"></div>
-<div id="app"></div>
+<div id="app"><div class="loading">⏳ טוען נתונים...</div></div>
+<div class="saving" id="saving">💾 שומר...</div>
 
-<script>
-// ── נתונים ── ערוך כאן את הדירות והמחסנים שלך
-const APTS = [
-  // דוגמה — מחק ומלא נתונים אמיתיים
-  // { id:"a1", number:"101", floor:1, area:65, balcony:8, leases:[], customFields:{} },
-];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const STORAGES = [
-  // דוגמה — מחק ומלא נתונים אמיתיים
-  // { id:"s1", number:"מ-1", linkedApt:"101", floor:-1, area:6, leases:[], customFields:{} },
-];
+const app = initializeApp({ databaseURL:"https://building-management-a4899-default-rtdb.firebaseio.com" });
+const db = getDatabase(app);
+const dataRef = ref(db, "building2");
 
-// ── קומות ──
 const APT_FLOORS = [0,1,2,3,4,5,6,7];
 const STOR_FLOORS = [-1,-2];
 const fmtFloor = f => f===0?"קומת קרקע":f<0?`קומה מינוס ${Math.abs(f)}`:`קומה ${f}`;
+const TABS = ["דירות","מחסנים","ניתוח","השוואה"];
 
-// ── utils ──
-const today = () => new Date().toISOString().slice(0,10);
 const fmtDate = d => d?new Date(d).toLocaleDateString("he-IL"):"—";
 const daysBetween = (a,b) => Math.max(0,Math.round((new Date(b)-new Date(a))/86400000));
 const monthsBetween = (a,b) => { const d1=new Date(a),d2=new Date(b); return Math.max(0,(d2.getFullYear()-d1.getFullYear())*12+d2.getMonth()-d1.getMonth()); };
+const today = () => new Date().toISOString().slice(0,10);
+const uid = () => Date.now()+Math.random().toString(36).slice(2,7);
+const getActiveTenant = asset => asset.tenants?.find(t=>t.status==="active")||null;
 const calcOcc = (asset,from,to) => {
   const tot=daysBetween(from,to); if(!tot) return 0;
   let occ=0;
-  for(const l of asset.leases){ const s=l.start>from?l.start:from,e=l.end<to?l.end:to; if(s<e)occ+=daysBetween(s,e); }
+  for(const t of (asset.tenants||[])){
+    if(!t.startDate) continue;
+    const end=t.endDate||to;
+    const s=t.startDate>from?t.startDate:from, e=end<to?end:to;
+    if(s<e) occ+=daysBetween(s,e);
+  }
   return Math.min(100,Math.round(occ/tot*100));
 };
-const getActive = (asset,d) => asset.leases.find(l=>l.start<=d&&l.end>=d)||null;
-const totalMonths = a => a.leases.reduce((s,l)=>s+monthsBetween(l.start,l.end),0);
-const uid = () => Date.now()+Math.random().toString(36).slice(2);
 
-// ── שמירה וטעינה מ-localStorage ──
-const STORAGE_KEY = "building_mgr_v1";
-function loadSaved() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
-  } catch(e) {}
-  return null;
-}
-function saveData(apts, storages) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({apts, storages})); } catch(e) {}
-}
-
-const saved = loadSaved();
-
-// ── State ──
 let state = {
-  tab: "דירות",
-  apts: saved ? saved.apts : APTS,
-  storages: saved ? saved.storages : STORAGES,
-  selectedId: null,
-  showAdd: false,
-  showAddLease: null,
-  editLease: null,
-  filterArea: { apt:"all", stor:"all" },
-  filterFloor: { apt:"all", stor:"all" },
-  newAsset: { number:"",floor:"",area:"",balcony:"",linkedApt:"" },
-  newLease: { tenant:"",start:"",end:"",rent:"",vaad:"",notes:"" },
-  editLeaseData: null,
-  reportFrom: new Date().getFullYear()+"-01-01",
-  reportTo: new Date().getFullYear()+"-12-31",
-  compareType: "apt",
-  compareArea: "all",
+  tab:"דירות", apts:[], storages:[], selectedId:null,
+  showAdd:false, expandedTenant:{},
+  filterArea:{apt:"all",stor:"all"}, filterFloor:{apt:"all",stor:"all"},
+  newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""},
+  reportFrom:new Date().getFullYear()+"-01-01",
+  reportTo:new Date().getFullYear()+"-12-31",
+  compareType:"apt", compareArea:"all",
+  modal:null
 };
 
-const TABS = ["דירות","מחסנים","ניתוח ודוחות","השוואה"];
-
-function setState(patch) {
-  Object.assign(state, patch);
-  saveData(state.apts, state.storages);
-  render();
+let saveTimer=null;
+function saveDB(){
+  document.getElementById("saving").style.display="block";
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    set(dataRef,{apts:state.apts,storages:state.storages})
+      .finally(()=>document.getElementById("saving").style.display="none");
+  },600);
 }
+function setState(patch,save=true){ Object.assign(state,patch); if(save) saveDB(); render(); }
 
-// ── HTML helpers ──
-const h = (tag,attrs,inner) => {
-  const el=document.createElement(tag);
-  for(const [k,v] of Object.entries(attrs||{})){
-    if(k==="style"&&typeof v==="object"){ Object.assign(el.style,v); }
-    else if(k.startsWith("on")){ el[k]=v; }
-    else{ el.setAttribute(k,v); }
+// ── DOM helpers ──
+const el=(tag,attrs={},children=[])=>{
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="style"&&typeof v==="object") Object.assign(e.style,v);
+    else if(k.startsWith("on")) e[k]=v;
+    else if(k==="className") e.className=v;
+    else e.setAttribute(k,v);
   }
-  if(typeof inner==="string") el.innerHTML=inner;
-  else if(Array.isArray(inner)) inner.forEach(c=>c&&el.appendChild(typeof c==="string"?Object.assign(document.createElement("span"),{textContent:c}):c));
-  return el;
+  for(const c of children){
+    if(c==null) continue;
+    if(typeof c==="string"||typeof c==="number") e.appendChild(document.createTextNode(c));
+    else e.appendChild(c);
+  }
+  return e;
 };
-const div = (cls,inner) => { const el=document.createElement("div"); if(cls)el.className=cls; if(typeof inner==="string")el.innerHTML=inner; else if(Array.isArray(inner)) inner.forEach(c=>c&&el.appendChild(c)); return el; };
-const span = (cls,text) => { const el=document.createElement("span"); el.className=cls||""; el.textContent=text; return el; };
-const badge = (cls,text) => span(`badge ${cls}`,text);
-const btn = (cls,text,onclick) => { const el=h("button",{class:`btn ${cls}`},text); el.onclick=onclick; return el; };
-const lbl = text => { const el=document.createElement("label"); el.className="lbl"; el.textContent=text; return el; };
-const inp = (type,val,onchange,style) => { const el=document.createElement("input"); el.type=type; el.value=val||""; el.onchange=e=>onchange(e.target.value); if(style)el.setAttribute("style",style); return el; };
-const sel = (options,val,onchange,style) => {
-  const el=document.createElement("select");
-  if(style)el.setAttribute("style",style);
-  options.forEach(([v,t])=>{ const o=document.createElement("option"); o.value=v; o.textContent=t; if(v==val)o.selected=true; el.appendChild(o); });
-  el.onchange=e=>onchange(e.target.value);
-  return el;
+const div=(cls,children=[])=>el("div",{className:cls},Array.isArray(children)?children:[children]);
+const span=(cls,text)=>el("span",{className:cls},[text]);
+const badge=(cls,text)=>span(`badge ${cls}`,text);
+const btn=(cls,text,onclick)=>el("button",{className:`btn ${cls}`,onclick},typeof text==="string"?[text]:[text]);
+const lbl=text=>el("label",{className:"lbl"},[text]);
+const inp=(type,val,onchange,placeholder="")=>{
+  const e=document.createElement("input");
+  e.type=type; e.value=val||""; e.placeholder=placeholder;
+  e.oninput=ev=>onchange(ev.target.value);
+  return e;
 };
-const colDiv = (labelText,child) => { const d=div("col"); d.appendChild(lbl(labelText)); d.appendChild(child); return d; };
+const sel=(options,val,onchange)=>{
+  const e=document.createElement("select");
+  options.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;if(String(v)===String(val))o.selected=true;e.appendChild(o);});
+  e.onchange=ev=>onchange(ev.target.value);
+  return e;
+};
+const colDiv=(labelText,child)=>{ const d=div("col",[lbl(labelText),child]); return d; };
+const textarea=(val,onchange,placeholder="")=>{
+  const e=document.createElement("textarea");
+  e.value=val||""; e.placeholder=placeholder;
+  e.oninput=ev=>onchange(ev.target.value);
+  return e;
+};
 
-// ── Badge helpers ──
-function leaseStatusBadge(l,tod) {
-  const isAct=l.start<=tod&&l.end>=tod;
-  const exp=!isAct&&l.end>=tod&&daysBetween(tod,l.end)<=60;
-  if(isAct) return badge("b-green","פעיל");
-  if(exp) return badge("b-yellow","פג בקרוב");
-  if(l.end<tod) return badge("b-gray","הסתיים");
-  return badge("b-blue","עתידי");
+// ── Tenant status badge ──
+function tenantStatusBadge(t){
+  if(t.status==="active") return badge("b-green","דייר פעיל");
+  if(t.status==="archived") return badge("b-gray","ארכיון");
+  return badge("b-gray","");
 }
 
-// ── OccBar ──
-function occBar(pct) {
-  const color=pct>=80?"#16a34a":pct>=50?"#d97706":"#dc2626";
-  const wrap=div("bar"); const fill=div("fill"); fill.style.width=pct+"%"; fill.style.background=color; wrap.appendChild(fill);
-  const row=div("occ"); row.appendChild(wrap); row.appendChild(document.createTextNode(" "+pct+"%")); return row;
+// ── Modal ──
+function showModal(content){
+  setState({modal:content},false);
+}
+function closeModal(){ setState({modal:null},false); }
+
+function renderModal(){
+  if(!state.modal) return null;
+  const overlay=div("",[ ]);
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px";
+  const box=div("card",[]);
+  box.style.cssText="max-width:560px;width:100%;max-height:90vh;overflow-y:auto;margin:0";
+  box.onclick=e=>e.stopPropagation();
+  box.appendChild(state.modal);
+  overlay.onclick=closeModal;
+  overlay.appendChild(box);
+  return overlay;
+}
+
+// ── New tenant form ──
+function buildNewTenantForm(assetId, isApt, onSave){
+  let data={name:"",phone:"",email:"",idNum:"",startDate:"",endDate:"",rent:"",vaad:"",deposit:"",notes:"",docs:[]};
+  let newDocName="", newDocUrl="";
+  const wrapper=div("",[]);
+
+  function rebuild(){
+    wrapper.innerHTML="";
+    const title=div("section-h",["➕ הוסף דייר חדש"]);
+    wrapper.appendChild(title);
+    const grid=div("form-grid",[]);
+    const fields=[
+      ["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
+      ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
+      ["תאריך יציאה משוער","endDate","date"],
+      ['שכ"ד ₪',"rent","number"],
+      ...(isApt?[["ועד בית ₪","vaad","number"]]:[]),
+      ["פיקדון ₪","deposit","number"],
+    ];
+    fields.forEach(([l,k,t])=>{
+      const input=inp(t,data[k],v=>{data[k]=v;});
+      grid.appendChild(colDiv(l,input));
+    });
+    wrapper.appendChild(grid);
+    const notesDiv=div("",[lbl("הערות"), textarea(data.notes,v=>{data.notes=v;},"הערות חופשיות...")]);
+    notesDiv.style.marginBottom="10px";
+    wrapper.appendChild(notesDiv);
+
+    // Docs
+    const docTitle=div("",["📎 קישורי מסמכים (גוגל דרייב וכו')"]);
+    docTitle.style.cssText="font-size:13px;font-weight:600;margin-bottom:6px";
+    wrapper.appendChild(docTitle);
+    data.docs.forEach((doc,i)=>{
+      const row=div("doc-row",[
+        el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
+        btn("btn-red btn-sm","✕",()=>{data.docs=data.docs.filter((_,j)=>j!==i);rebuild();})
+      ]);
+      wrapper.appendChild(row);
+    });
+    const docRow=div("row",[]);
+    const nameInp=inp("text",newDocName,v=>{newDocName=v;},"שם המסמך");
+    nameInp.style.width="160px";
+    const urlInp=inp("text",newDocUrl,v=>{newDocUrl=v;},"קישור (URL)");
+    const addDocBtn=btn("btn-sm","+ הוסף קישור",()=>{
+      if(!newDocName||!newDocUrl) return;
+      data.docs.push({id:uid(),name:newDocName,url:newDocUrl});
+      newDocName=""; newDocUrl=""; rebuild();
+    });
+    docRow.appendChild(nameInp); docRow.appendChild(urlInp); docRow.appendChild(addDocBtn);
+    wrapper.appendChild(docRow);
+
+    const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
+    const btns=div("actions-row",[
+      btn("btn-green","✅ שמור דייר",()=>{
+        if(!data.name||!data.startDate||!data.rent) return alert("נא למלא שם, תאריך כניסה וסכום שכ\"ד");
+        onSave({...data,id:uid(),status:"active",rent:Number(data.rent),vaad:Number(data.vaad||0),deposit:Number(data.deposit||0)});
+      }),
+      btn("","ביטול",closeModal)
+    ]);
+    wrapper.appendChild(btns);
+  }
+  rebuild();
+  return wrapper;
+}
+
+// ── Edit tenant form ──
+function buildEditTenantForm(tenant, onSave){
+  let data={...tenant};
+  let newDocName="", newDocUrl="";
+  const wrapper=div("",[]);
+
+  function rebuild(){
+    wrapper.innerHTML="";
+    const title=div("section-h",["✏️ עריכת פרטי דייר"]);
+    wrapper.appendChild(title);
+    const grid=div("form-grid",[]);
+    const fields=[
+      ["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
+      ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
+      ["תאריך יציאה","endDate","date"],
+      ['שכ"ד ₪',"rent","number"],["ועד בית ₪","vaad","number"],
+      ["פיקדון ₪","deposit","number"],
+    ];
+    fields.forEach(([l,k,t])=>{
+      const input=inp(t,data[k],v=>{data[k]=v;});
+      grid.appendChild(colDiv(l,input));
+    });
+    wrapper.appendChild(grid);
+    const notesDiv=div("",[lbl("הערות"), textarea(data.notes,v=>{data.notes=v;},"")]);
+    notesDiv.style.marginBottom="10px";
+    wrapper.appendChild(notesDiv);
+
+    const docTitle=div("",["📎 קישורי מסמכים"]);
+    docTitle.style.cssText="font-size:13px;font-weight:600;margin-bottom:6px";
+    wrapper.appendChild(docTitle);
+    (data.docs||[]).forEach((doc,i)=>{
+      const row=div("doc-row",[
+        el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
+        btn("btn-red btn-sm","✕",()=>{data.docs=data.docs.filter((_,j)=>j!==i);rebuild();})
+      ]);
+      wrapper.appendChild(row);
+    });
+    const docRow=div("row",[]);
+    const nameInp=inp("text",newDocName,v=>{newDocName=v;},"שם המסמך");
+    nameInp.style.width="160px";
+    const urlInp=inp("text",newDocUrl,v=>{newDocUrl=v;},"קישור (URL)");
+    const addDocBtn=btn("btn-sm","+ הוסף",()=>{
+      if(!newDocName||!newDocUrl) return;
+      if(!data.docs) data.docs=[];
+      data.docs.push({id:uid(),name:newDocName,url:newDocUrl});
+      newDocName=""; newDocUrl=""; rebuild();
+    });
+    docRow.appendChild(nameInp); docRow.appendChild(urlInp); docRow.appendChild(addDocBtn);
+    wrapper.appendChild(docRow);
+
+    const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
+    const btns=div("actions-row",[
+      btn("btn-blue","💾 שמור שינויים",()=>{
+        onSave({...data,rent:Number(data.rent||0),vaad:Number(data.vaad||0),deposit:Number(data.deposit||0)});
+      }),
+      btn("","ביטול",closeModal)
+    ]);
+    wrapper.appendChild(btns);
+  }
+  rebuild();
+  return wrapper;
+}
+
+// ── Close account form ──
+function buildCloseAccountForm(tenant, onSave){
+  let data={endDate:today(),finalNote:"",refundDeposit:false};
+  const wrapper=div("",[]);
+  wrapper.innerHTML="";
+  const title=div("section-h",["🔒 סגירת חשבון — "+tenant.name]);
+  wrapper.appendChild(title);
+  const alert=div("alert alert-yellow",["הדייר יועבר לארכיון. כל הנתונים שלו יישמרו במערכת."]);
+  wrapper.appendChild(alert);
+  const grid=div("form-grid",[
+    colDiv("תאריך יציאה בפועל", inp("date",data.endDate,v=>{data.endDate=v;})),
+    colDiv("הוחזר פיקדון?", sel([["false","לא"],["true","כן"]],data.refundDeposit,v=>{data.refundDeposit=v==="true";})),
+  ]);
+  wrapper.appendChild(grid);
+  const noteDiv=div("",[lbl("הערת סיום"), textarea(data.finalNote,v=>{data.finalNote=v;},"פגמים, חובות, הערות...")]);
+  noteDiv.style.marginBottom="10px";
+  wrapper.appendChild(noteDiv);
+  const hr=document.createElement("hr"); hr.className="sep"; wrapper.appendChild(hr);
+  const btns=div("actions-row",[
+    btn("btn-orange","🔒 סגור חשבון",()=>{
+      if(!data.endDate) return alert("נא לבחור תאריך יציאה");
+      onSave(data);
+    }),
+    btn("","ביטול",closeModal)
+  ]);
+  wrapper.appendChild(btns);
+  return wrapper;
 }
 
 // ── Asset Manager ──
-function renderAssetManager(assets,type) {
-  const isApt=type==="apt";
-  const typeLabel=isApt?"דירה":"מחסן";
+function renderAssetManager(assets, type){
+  const isApt=type==="apt", typeLabel=isApt?"דירה":"מחסן";
   const floorOpts=isApt?APT_FLOORS:STOR_FLOORS;
   const tod=today();
   const fa=state.filterArea[type], ff=state.filterFloor[type];
   const areas=[...new Set(assets.map(a=>a.area))].sort((a,b)=>a-b);
   const filtered=assets.filter(a=>(fa==="all"||a.area===Number(fa))&&(ff==="all"||a.floor===Number(ff)));
   const aptNums=state.apts.map(a=>a.number);
+  const wrap=div("",[]);
 
-  const wrap=div("");
-
-  // Filter row
-  const frow=div("row mb8");
-  frow.appendChild(colDiv("שטח", sel([["all","הכל"],...areas.map(a=>[a,a+' מ"ר'])],fa,v=>setState({filterArea:{...state.filterArea,[type]:v}}),"")));
-  frow.appendChild(colDiv("קומה", sel([["all","הכל"],...floorOpts.map(f=>[f,fmtFloor(f)])],ff,v=>setState({filterFloor:{...state.filterFloor,[type]:v}}),"min-width:140px")));
-  const addBtn=btn("btn-blue","+ הוסף "+typeLabel,()=>setState({showAdd:!state.showAdd,selectedId:null}));
-  addBtn.style.marginRight="auto";
-  frow.appendChild(addBtn);
+  const frow=div("filter-row",[]);
+  frow.appendChild(colDiv("שטח", sel([["all","הכל"],...areas.map(a=>[a,a+' מ"ר'])],fa,v=>setState({filterArea:{...state.filterArea,[type]:v}},false))));
+  frow.appendChild(colDiv("קומה", sel([["all","הכל"],...floorOpts.map(f=>[f,fmtFloor(f)])],ff,v=>setState({filterFloor:{...state.filterFloor,[type]:v}},false))));
+  const ab=btn("btn-blue","+ הוסף "+typeLabel,()=>setState({showAdd:state.showAdd?false:type,selectedId:null},false));
+  ab.style.marginRight="auto";
+  frow.appendChild(ab);
   wrap.appendChild(frow);
 
-  // Add form
-  if(state.showAdd) {
-    const form=div("card mb16");
-    form.style.borderColor="#93c5fd";
-    const t=div("section-h"); t.textContent=typeLabel+" חדש"; form.appendChild(t);
-    const grid=div("form-grid");
+  if(state.showAdd===type){
+    const form=div("form-box",[]);
+    const t=div("section-h",[typeLabel+" חדש"]); form.appendChild(t);
+    const grid=div("form-grid",[]);
     const na=state.newAsset;
-    grid.appendChild(colDiv("מס' "+typeLabel, inp("text",na.number,v=>setState({newAsset:{...state.newAsset,number:v}}))));
-    grid.appendChild(colDiv("קומה", sel([["","בחר"],...floorOpts.map(f=>[f,fmtFloor(f)])],na.floor,v=>setState({newAsset:{...state.newAsset,floor:v}}))));
-    grid.appendChild(colDiv('שטח מ"ר', inp("number",na.area,v=>setState({newAsset:{...state.newAsset,area:v}}))));
-    if(isApt) grid.appendChild(colDiv('מרפסת מ"ר', inp("number",na.balcony,v=>setState({newAsset:{...state.newAsset,balcony:v}}))));
-    if(!isApt) grid.appendChild(colDiv("קשור לדירה", sel([["","ללא"],...aptNums.map(n=>[n,"דירה "+n])],na.linkedApt,v=>setState({newAsset:{...state.newAsset,linkedApt:v}}))));
+    grid.appendChild(colDiv("מס' "+typeLabel, inp("text",na.number,v=>setState({newAsset:{...state.newAsset,number:v}},false))));
+    grid.appendChild(colDiv("קומה", sel([["","בחר"],...floorOpts.map(f=>[f,fmtFloor(f)])],na.floor,v=>setState({newAsset:{...state.newAsset,floor:v}},false))));
+    grid.appendChild(colDiv('שטח מ"ר', inp("number",na.area,v=>setState({newAsset:{...state.newAsset,area:v}},false))));
+    if(isApt) grid.appendChild(colDiv('מרפסת מ"ר', inp("number",na.balcony,v=>setState({newAsset:{...state.newAsset,balcony:v}},false))));
+    else grid.appendChild(colDiv("קשור לדירה", sel([["","ללא"],...aptNums.map(n=>[n,"דירה "+n])],na.linkedApt,v=>setState({newAsset:{...state.newAsset,linkedApt:v}},false))));
     form.appendChild(grid);
-    const brow=div("row"); 
-    brow.appendChild(btn("btn-blue","שמור",()=>{
-      if(!state.newAsset.number||state.newAsset.floor===""||!state.newAsset.area) return alert("נא למלא מספר, קומה ושטח");
-      const list=isApt?state.apts:state.storages;
-      const newItem={id:uid(),number:state.newAsset.number,floor:Number(state.newAsset.floor),area:Number(state.newAsset.area),balcony:Number(state.newAsset.balcony||0),linkedApt:state.newAsset.linkedApt||"",leases:[],customFields:{}};
-      if(isApt) setState({apts:[...state.apts,newItem],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
-      else setState({storages:[...state.storages,newItem],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
-    }));
-    brow.appendChild(btn("","ביטול",()=>setState({showAdd:false})));
-    form.appendChild(brow);
-    wrap.appendChild(form);
+    const brow=div("row",[
+      btn("btn-blue","שמור",()=>{
+        const na=state.newAsset;
+        if(!na.number||na.floor===""||!na.area) return alert("נא למלא מספר, קומה ושטח");
+        const item={id:uid(),number:na.number,floor:Number(na.floor),area:Number(na.area),balcony:Number(na.balcony||0),linkedApt:na.linkedApt||"",tenants:[]};
+        if(isApt) setState({apts:[...state.apts,item],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
+        else setState({storages:[...state.storages,item],showAdd:false,newAsset:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
+      }),
+      btn("","ביטול",()=>setState({showAdd:false},false))
+    ]);
+    form.appendChild(brow); wrap.appendChild(form);
   }
 
-  // Asset list
+  if(filtered.length===0){
+    const em=div("empty",["אין "+typeLabel+"ות. לחץ '+ הוסף "+typeLabel+"' כדי להתחיל."]);
+    wrap.appendChild(em);
+  }
+
   filtered.forEach(asset=>{
-    const active=getActive(asset,tod);
+    const activeTenant=getActiveTenant(asset);
     const occ=calcOcc(asset,state.reportFrom,state.reportTo);
     const isSel=state.selectedId===asset.id;
-    const card=div("card asset-card"+(isSel?" sel":""));
-    card.onclick=()=>setState({selectedId:isSel?null:asset.id,showAdd:false,showAddLease:null,editLease:null});
+    const tenants=asset.tenants||[];
+    const card=div("card asset-card"+(isSel?" sel":""),[]);
+    card.onclick=()=>setState({selectedId:isSel?null:asset.id,showAdd:false},false);
 
     // Header
-    const head=div("asset-head");
-    const numBox=div("num-box"); numBox.textContent=asset.number; head.appendChild(numBox);
-    const info=div("info");
-    const main=div("info-main");
-    main.appendChild(span("",typeLabel+" "+asset.number));
+    const head=div("asset-head",[]);
+    const nb=div("num-box",[asset.number]); head.appendChild(nb);
+    const info=div("info",[]);
+    const main=div("info-main",[]);
+    const nameSpan=el("span",{style:{fontWeight:"600",fontSize:"15px"}},[typeLabel+" "+asset.number]);
+    main.appendChild(nameSpan);
     main.appendChild(badge("b-gray",fmtFloor(asset.floor)));
     main.appendChild(badge("b-gray",asset.area+' מ"ר'));
     if(isApt&&asset.balcony>0) main.appendChild(badge("b-gray","מרפסת "+asset.balcony+' מ"ר'));
     if(!isApt&&asset.linkedApt) main.appendChild(badge("b-gray","דירה "+asset.linkedApt));
-    main.appendChild(active?badge("b-green","מושכר"):badge("b-yellow","פנוי"));
+    if(activeTenant) main.appendChild(badge("b-green","מושכר"));
+    else main.appendChild(badge("b-yellow","פנוי"));
     info.appendChild(main);
-    const sub=div("info-sub");
-    sub.textContent=(active?active.tenant+" | ₪"+active.rent.toLocaleString()+(isApt&&active.vaad?" + ועד ₪"+active.vaad:""):"אין חוזה פעיל")+" · תפוסה: "+occ+"% · "+totalMonths(asset)+" חודשים";
-    info.appendChild(sub);
-    head.appendChild(info);
-    const acts=div("actions");
-    if(active) { const pm=span("","₪"+(active.rent/asset.area).toFixed(0)+'/מ"ר'); pm.style.fontSize="12px"; pm.style.color="#666"; acts.appendChild(pm); }
-    acts.appendChild(btn("btn-red btn-sm","מחק",e=>{ e.stopPropagation(); if(confirm("למחוק "+typeLabel+" "+asset.number+"?")){ const nl=isApt?state.apts.filter(a=>a.id!==asset.id):state.storages.filter(a=>a.id!==asset.id); if(isApt)setState({apts:nl,selectedId:null}); else setState({storages:nl,selectedId:null}); }}));
+    const sub=div("info-sub",[]);
+    if(activeTenant){
+      sub.textContent=activeTenant.name+(activeTenant.phone?" | "+activeTenant.phone:"")+" | ₪"+Number(activeTenant.rent).toLocaleString()+(isApt&&activeTenant.vaad?" + ועד ₪"+activeTenant.vaad:"")+" | כניסה: "+fmtDate(activeTenant.startDate);
+    } else {
+      sub.textContent="אין דייר פעיל · היסטוריה: "+tenants.length+" דיירים";
+    }
+    info.appendChild(sub); head.appendChild(info);
+    const acts=div("",[ btn("btn-red btn-sm","מחק",e=>{e.stopPropagation();if(confirm("למחוק "+typeLabel+" "+asset.number+"?")){if(isApt)setState({apts:state.apts.filter(a=>a.id!==asset.id),selectedId:null});else setState({storages:state.storages.filter(a=>a.id!==asset.id),selectedId:null});}}) ]);
+    acts.style.flexShrink="0";
     head.appendChild(acts);
     card.appendChild(head);
 
-    // Expanded
-    if(isSel) {
-      const det=div("detail"); det.onclick=e=>e.stopPropagation();
-      const lh=div("row mb8"); lh.style.justifyContent="space-between";
-      const lt=span("section-h","חוזי שכירות ("+asset.leases.length+")"); lh.appendChild(lt);
-      const alBtn=btn("","+ הוסף חוזה",()=>setState({showAddLease:state.showAddLease===asset.id?null:asset.id,newLease:{tenant:"",start:"",end:"",rent:"",vaad:"",notes:""}}));
-      lh.appendChild(alBtn); det.appendChild(lh);
+    // Detail
+    if(isSel){
+      const det=div("detail",[]); det.onclick=e=>e.stopPropagation();
 
-      if(state.showAddLease===asset.id) {
-        const lf=div("form-box mb8");
-        const lg=div("form-grid");
-        const fields=[["שם שוכר","tenant","text"],["מתאריך","start","date"],["עד תאריך","end","date"],['שכ"ד ₪',"rent","number"],...(isApt?[["ועד בית ₪","vaad","number"]]:[]),["הערות","notes","text"]];
-        fields.forEach(([l,k,t])=>{ const nl=state.newLease; lg.appendChild(colDiv(l, inp(t,nl[k],v=>setState({newLease:{...state.newLease,[k]:v}})))); });
-        lf.appendChild(lg);
-        const lb=div("row");
-        lb.appendChild(btn("btn-blue","שמור חוזה",()=>{
-          const nl=state.newLease;
-          if(!nl.tenant||!nl.start||!nl.end||!nl.rent) return alert("נא למלא שם, תאריכים וסכום");
-          const lease={...nl,rent:Number(nl.rent),vaad:Number(nl.vaad||0)};
-          const updated=isApt?state.apts.map(a=>a.id===asset.id?{...a,leases:[...a.leases,lease]}:a):state.storages.map(a=>a.id===asset.id?{...a,leases:[...a.leases,lease]}:a);
-          if(isApt)setState({apts:updated,showAddLease:null}); else setState({storages:updated,showAddLease:null});
+      // Add tenant button
+      const addTenantBtn=btn("btn-green","+ הוסף דייר חדש",()=>{
+        showModal(buildNewTenantForm(asset.id, isApt, (newTenant)=>{
+          // archive current active if exists
+          let updatedTenants=tenants.map(t=>t.status==="active"?{...t,status:"archived"}:t);
+          updatedTenants=[...updatedTenants, newTenant];
+          const setter=isApt?setApts:setStorages;
+          setter(asset.id, updatedTenants);
+          closeModal();
         }));
-        lb.appendChild(btn("","ביטול",()=>setState({showAddLease:null})));
-        lf.appendChild(lb); det.appendChild(lf);
+      });
+      det.appendChild(addTenantBtn);
+
+      if(tenants.length===0){
+        const em=div("empty",["אין דיירים עדיין"]); em.style.marginTop="10px"; det.appendChild(em);
       }
 
-      if(asset.leases.length===0) { const em=div("empty"); em.textContent="אין חוזים עדיין"; det.appendChild(em); }
+      // Show active tenant first, then archived
+      const sorted=[...tenants].sort((a,b)=>{ if(a.status==="active") return -1; if(b.status==="active") return 1; return (b.startDate||"").localeCompare(a.startDate||""); });
 
-      asset.leases.forEach((l,i)=>{
-        const isAct=l.start<=tod&&l.end>=tod;
-        const isExp=!isAct&&l.end>=tod&&daysBetween(tod,l.end)<=60;
-        const editing=state.editLease&&state.editLease.assetId===asset.id&&state.editLease.idx===i;
-        if(editing) {
-          const ef=div("form-box mb8");
-          const eg=div("form-grid");
-          const fields=[["שם שוכר","tenant","text"],["מתאריך","start","date"],["עד תאריך","end","date"],['שכ"ד ₪',"rent","number"],...(isApt?[["ועד בית ₪","vaad","number"]]:[]),["הערות","notes","text"]];
-          fields.forEach(([l2,k,t])=>{ const ed=state.editLease.data; eg.appendChild(colDiv(l2, inp(t,ed[k],v=>setState({editLease:{...state.editLease,data:{...state.editLease.data,[k]:v}}})))); });
-          ef.appendChild(eg);
-          const eb=div("row");
-          eb.appendChild(btn("btn-blue","שמור שינויים",()=>{
-            const d=state.editLease.data;
-            const lease={...d,rent:Number(d.rent),vaad:Number(d.vaad||0)};
-            const updated=isApt?state.apts.map(a=>a.id===asset.id?{...a,leases:a.leases.map((x,j)=>j===i?lease:x)}:a):state.storages.map(a=>a.id===asset.id?{...a,leases:a.leases.map((x,j)=>j===i?lease:x)}:a);
-            if(isApt)setState({apts:updated,editLease:null}); else setState({storages:updated,editLease:null});
-          }));
-          eb.appendChild(btn("","ביטול",()=>setState({editLease:null})));
-          ef.appendChild(eb); det.appendChild(ef);
-        } else {
-          const lr=div("lease"+(isAct?" active":isExp?" exp":""));
-          const ll=div("lease-left");
-          const lt2=div(""); lt2.style.display="flex"; lt2.style.gap="6px"; lt2.style.alignItems="center"; lt2.style.marginBottom="3px";
-          lt2.appendChild(span("",l.tenant)); lt2.appendChild(leaseStatusBadge(l,tod)); ll.appendChild(lt2);
-          const ls=div(""); ls.style.fontSize="11px"; ls.style.color="#666";
-          ls.textContent=fmtDate(l.start)+" — "+fmtDate(l.end)+" · "+monthsBetween(l.start,l.end)+" חודשים"+(l.notes?" · "+l.notes:"");
-          ll.appendChild(ls); lr.appendChild(ll);
-          const lright=div("lease-right");
-          const lprice=div(""); lprice.style.textAlign="left";
-          lprice.innerHTML="<strong>₪"+l.rent.toLocaleString()+"</strong>/חודש";
-          if(isApt&&l.vaad>0){ const lv=document.createElement("div"); lv.style.fontSize="11px"; lv.style.color="#666"; lv.textContent="ועד ₪"+l.vaad; lprice.appendChild(lv); }
-          const lpm=document.createElement("div"); lpm.style.fontSize="11px"; lpm.style.color="#666"; lpm.textContent="₪"+(l.rent/asset.area).toFixed(0)+'/מ"ר'; lprice.appendChild(lpm);
-          lright.appendChild(lprice);
-          lright.appendChild(btn("btn-sm","✏️ ערוך",()=>setState({editLease:{assetId:asset.id,idx:i,data:{...l}}})));
-          lright.appendChild(btn("btn-red btn-sm","מחק",()=>{ if(confirm("למחוק חוזה זה?")){ const updated=isApt?state.apts.map(a=>a.id===asset.id?{...a,leases:a.leases.filter((_,j)=>j!==i)}:a):state.storages.map(a=>a.id===asset.id?{...a,leases:a.leases.filter((_,j)=>j!==i)}:a); if(isApt)setState({apts:updated}); else setState({storages:updated}); }}));
-          lr.appendChild(lright); det.appendChild(lr);
+      sorted.forEach((tenant,i)=>{
+        const isActive=tenant.status==="active";
+        const expandKey=asset.id+"_"+tenant.id;
+        const isOpen=!!state.expandedTenant[expandKey];
+
+        const tc=div("tenant-card"+(isActive?" active-tenant":" archived-tenant"),[]);
+        tc.style.marginTop="10px";
+
+        // Tenant header
+        const th=div("tenant-header",[]);
+        th.onclick=()=>{
+          const exp={...state.expandedTenant};
+          exp[expandKey]=!exp[expandKey];
+          setState({expandedTenant:exp},false);
+        };
+        const tLeft=div("",[]);
+        tLeft.style.cssText="display:flex;gap:8px;align-items:center";
+        tLeft.appendChild(el("span",{style:{fontWeight:"600"}},[tenant.name||"ללא שם"]));
+        tLeft.appendChild(tenantStatusBadge(tenant));
+        if(tenant.startDate){
+          const dates=el("span",{style:{fontSize:"12px",color:"#666"}},[fmtDate(tenant.startDate)+(tenant.endDate?" — "+fmtDate(tenant.endDate):"")]);
+          tLeft.appendChild(dates);
         }
+        th.appendChild(tLeft);
+        const tRight=div("",[]);
+        tRight.style.cssText="display:flex;gap:6px;align-items:center";
+        if(tenant.rent) tRight.appendChild(el("span",{style:{fontSize:"13px",fontWeight:"600"}},["₪"+Number(tenant.rent).toLocaleString()]));
+        tRight.appendChild(el("span",{style:{fontSize:"16px",color:"#666"}},[isOpen?"▲":"▼"]));
+        th.appendChild(tRight);
+        tc.appendChild(th);
+
+        // Tenant body
+        const tb=div("tenant-body"+(isOpen?" open":""),[]);
+
+        // Fields grid
+        const fg=div("form-grid",[]);
+        const infoFields=[
+          ["טלפון",tenant.phone||"—"],["אימייל",tenant.email||"—"],
+          ["תעודת זהות",tenant.idNum||"—"],["פיקדון","₪"+Number(tenant.deposit||0).toLocaleString()],
+          ['שכ"ד',"₪"+Number(tenant.rent||0).toLocaleString()],
+          ...(isApt?[["ועד בית","₪"+Number(tenant.vaad||0).toLocaleString()]]:[]),
+          ["כניסה",fmtDate(tenant.startDate)],["יציאה",tenant.endDate?fmtDate(tenant.endDate):"—"],
+          ["משך",tenant.startDate?monthsBetween(tenant.startDate,tenant.endDate||today())+" חודשים":"—"],
+        ];
+        infoFields.forEach(([l,v])=>{
+          const cell=div("cmp-cell",[]);
+          cell.innerHTML="<div class='cmp-lbl'>"+l+"</div><div class='cmp-val'>"+v+"</div>";
+          fg.appendChild(cell);
+        });
+        tb.appendChild(fg);
+
+        if(tenant.notes){
+          const noteDiv=div("",[]);
+          noteDiv.style.cssText="background:#fafafa;border-radius:6px;padding:8px 10px;font-size:12px;color:#444;margin-bottom:8px";
+          noteDiv.textContent="📝 "+tenant.notes;
+          tb.appendChild(noteDiv);
+        }
+
+        if(tenant.finalNote){
+          const fnDiv=div("",[]);
+          fnDiv.style.cssText="background:#fff7ed;border-radius:6px;padding:8px 10px;font-size:12px;color:#92400e;margin-bottom:8px";
+          fnDiv.textContent="🔒 סיום: "+tenant.finalNote+(tenant.refundDeposit?" | פיקדון הוחזר":"");
+          tb.appendChild(fnDiv);
+        }
+
+        // Documents
+        const docs=tenant.docs||[];
+        if(docs.length>0){
+          const docTitle=div("",["📎 מסמכים"]);
+          docTitle.style.cssText="font-size:12px;font-weight:600;margin-bottom:5px";
+          tb.appendChild(docTitle);
+          docs.forEach(doc=>{
+            const row=div("doc-row",[
+              el("a",{className:"doc-link",href:doc.url,target:"_blank"},[doc.name]),
+              el("span",{style:{fontSize:"11px",color:"#999"}},["↗"])
+            ]);
+            tb.appendChild(row);
+          });
+        }
+
+        // Action buttons
+        const abRow=div("actions-row",[]);
+        abRow.style.marginTop="10px";
+        abRow.appendChild(btn("btn-sm","✏️ ערוך",()=>{
+          showModal(buildEditTenantForm(tenant,(updated)=>{
+            updateTenant(asset.id, tenant.id, updated, isApt);
+            closeModal();
+          }));
+        }));
+        if(isActive){
+          abRow.appendChild(btn("btn-orange btn-sm","🔒 סגור חשבון",()=>{
+            showModal(buildCloseAccountForm(tenant,(closeData)=>{
+              updateTenant(asset.id, tenant.id, {...tenant, status:"archived", endDate:closeData.endDate, finalNote:closeData.finalNote, refundDeposit:closeData.refundDeposit}, isApt);
+              closeModal();
+            }));
+          }));
+        }
+        abRow.appendChild(btn("btn-red btn-sm","מחק",()=>{
+          if(confirm("למחוק דייר זה לצמיתות?")){
+            removeTenant(asset.id, tenant.id, isApt);
+          }
+        }));
+        tb.appendChild(abRow);
+        tc.appendChild(tb);
+        det.appendChild(tc);
       });
+
       card.appendChild(det);
     }
     wrap.appendChild(card);
   });
-
-  if(filtered.length===0) { const em=div(""); em.style.color="#aaa"; em.style.padding="20px 0"; em.textContent="אין "+typeLabel+"ות. לחץ '+ הוסף "+typeLabel+"' כדי להתחיל."; wrap.appendChild(em); }
   return wrap;
 }
 
-// ── Report Tab ──
-function renderReport() {
-  const tod=today();
-  const wrap=div("");
-  const frow=div("row mb16");
-  frow.appendChild(colDiv("מתאריך", inp("date",state.reportFrom,v=>setState({reportFrom:v}))));
-  frow.appendChild(colDiv("עד תאריך", inp("date",state.reportTo,v=>setState({reportTo:v}))));
+function setApts(assetId, newTenants){
+  setState({apts:state.apts.map(a=>a.id===assetId?{...a,tenants:newTenants}:a)});
+}
+function setStorages(assetId, newTenants){
+  setState({storages:state.storages.map(a=>a.id===assetId?{...a,tenants:newTenants}:a)});
+}
+function updateTenant(assetId, tenantId, updated, isApt){
+  const setter=isApt?setApts:setStorages;
+  const asset=(isApt?state.apts:state.storages).find(a=>a.id===assetId);
+  setter(assetId, (asset.tenants||[]).map(t=>t.id===tenantId?updated:t));
+}
+function removeTenant(assetId, tenantId, isApt){
+  const setter=isApt?setApts:setStorages;
+  const asset=(isApt?state.apts:state.storages).find(a=>a.id===assetId);
+  setter(assetId, (asset.tenants||[]).filter(t=>t.id!==tenantId));
+}
+
+// ── Report ──
+function renderReport(){
+  const tod=today(); const wrap=div("",[]);
+  const frow=div("row",[
+    colDiv("מתאריך",inp("date",state.reportFrom,v=>setState({reportFrom:v},false))),
+    colDiv("עד תאריך",inp("date",state.reportTo,v=>setState({reportTo:v},false)))
+  ]);
+  frow.style.marginBottom="16px";
   wrap.appendChild(frow);
 
-  const aptActive=state.apts.filter(a=>getActive(a,tod)).length;
-  const storActive=state.storages.filter(a=>getActive(a,tod)).length;
+  const aptAct=state.apts.filter(a=>getActiveTenant(a)).length;
+  const storAct=state.storages.filter(a=>getActiveTenant(a)).length;
   const aptOcc=state.apts.length?Math.round(state.apts.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/state.apts.length):0;
   const storOcc=state.storages.length?Math.round(state.storages.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/state.storages.length):0;
-  const aptInc=state.apts.reduce((s,a)=>{const l=getActive(a,tod);return s+(l?l.rent+(l.vaad||0):0);},0);
-  const storInc=state.storages.reduce((s,a)=>{const l=getActive(a,tod);return s+(l?l.rent:0);},0);
+  const aptInc=state.apts.reduce((s,a)=>{const t=getActiveTenant(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
+  const storInc=state.storages.reduce((s,a)=>{const t=getActiveTenant(a);return s+(t?Number(t.rent||0):0);},0);
 
-  const mg=div("metrics");
-  [[aptActive+"/"+state.apts.length,"דירות מושכרות"],[storActive+"/"+state.storages.length,"מחסנים מושכרים"],[aptOcc+"%","תפוסה דירות"],[storOcc+"%","תפוסה מחסנים"],["₪"+aptInc.toLocaleString(),"הכנסה דירות"],["₪"+storInc.toLocaleString(),"הכנסה מחסנים"],["₪"+(aptInc+storInc).toLocaleString(),'סה"כ חודשי']].forEach(([v,l])=>{
-    const m=div("metric"); m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>"; mg.appendChild(m);
+  const mg=div("metrics",[]);
+  [[aptAct+"/"+state.apts.length,"דירות מושכרות"],[storAct+"/"+state.storages.length,"מחסנים מושכרים"],[aptOcc+"%","תפוסה דירות"],[storOcc+"%","תפוסה מחסנים"],["₪"+aptInc.toLocaleString(),"הכנסה דירות"],["₪"+storInc.toLocaleString(),"הכנסה מחסנים"],["₪"+(aptInc+storInc).toLocaleString(),'סה"כ חודשי']].forEach(([v,l])=>{
+    const m=div("metric",[]); m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>"; mg.appendChild(m);
   });
   wrap.appendChild(mg);
 
   [{assets:state.apts,label:"דירות",isApt:true},{assets:state.storages,label:"מחסנים",isApt:false}].forEach(({assets,label,isApt})=>{
-    const sh=div("section-h mb8"); sh.textContent=label; wrap.appendChild(sh);
-    const ow=div(""); ow.style.overflowX="auto"; ow.style.marginBottom="24px";
+    const sh=div("section-h",[label]); wrap.appendChild(sh);
+    const ow=div("ov",[]);
     const tbl=document.createElement("table");
-    const heads=[isApt?"דירה":"מחסן","קומה",'שטח',isApt?"מרפסת":"דירה קשורה","תפוסה","חודשים",'שכ"ד',isApt?"ועד":"",`₪/מ"ר`].filter(Boolean);
+    const heads=[isApt?"דירה":"מחסן","קומה","שטח","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"].filter(Boolean);
     tbl.innerHTML="<thead><tr>"+heads.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead>";
     const tb=document.createElement("tbody");
     assets.forEach(a=>{
-      const active=getActive(a,tod); const occ=calcOcc(a,state.reportFrom,state.reportTo);
+      const at=getActiveTenant(a); const occ=calcOcc(a,state.reportFrom,state.reportTo);
       const occColor=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
       const tr=document.createElement("tr");
-      const cells=[
-        "<strong>"+a.number+"</strong>",
-        fmtFloor(a.floor),
-        a.area+' מ"ר',
-        isApt?(a.balcony>0?a.balcony+' מ"ר':"—"):(a.linkedApt?"דירה "+a.linkedApt:"—"),
-        "<span style='color:"+occColor+";font-weight:600'>"+occ+"%</span>",
-        totalMonths(a),
-        active?"₪"+active.rent.toLocaleString():"<span style='color:#aaa'>פנוי</span>",
-        ...(isApt?[active?"₪"+active.vaad:"—"]:[]),
-        active?"₪"+(active.rent/a.area).toFixed(0):"—"
-      ];
-      tr.innerHTML=cells.map(c=>"<td>"+c+"</td>").join("");
-      tb.appendChild(tr);
+      const cells=["<strong>"+a.number+"</strong>",fmtFloor(a.floor),a.area+' מ"ר',at?at.name:"<span style='color:#aaa'>פנוי</span>",at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"—"):"—",at?"₪"+Number(at.rent).toLocaleString():"—","<span style='color:"+occColor+";font-weight:600'>"+occ+"%</span>",(a.tenants||[]).length+" דיירים"];
+      tr.innerHTML=cells.map(c=>"<td>"+c+"</td>").join(""); tb.appendChild(tr);
     });
     tbl.appendChild(tb); ow.appendChild(tbl); wrap.appendChild(ow);
   });
   return wrap;
 }
 
-// ── Compare Tab ──
-function renderCompare() {
-  const tod=today();
-  const wrap=div("");
-  const frow=div("row mb16");
-  frow.appendChild(colDiv("סוג נכס", sel([["apt","דירות"],["stor","מחסנים"]],state.compareType,v=>setState({compareType:v,compareArea:"all"}),"min-width:110px")));
+// ── Compare ──
+function renderCompare(){
+  const tod=today(); const wrap=div("",[]);
+  const frow=div("row",[
+    colDiv("סוג נכס",sel([["apt","דירות"],["stor","מחסנים"]],state.compareType,v=>setState({compareType:v,compareArea:"all"},false))),
+  ]);
   const src=state.compareType==="apt"?state.apts:state.storages;
   const areas=[...new Set(src.map(a=>a.area))].sort((a,b)=>a-b);
-  frow.appendChild(colDiv("שטח", sel([["all","כל הגדלים"],...areas.map(a=>[a,a+' מ"ר'])],state.compareArea,v=>setState({compareArea:v}),"min-width:130px")));
+  frow.appendChild(colDiv("שטח",sel([["all","כל הגדלים"],...areas.map(a=>[a,a+' מ"ר'])],state.compareArea,v=>setState({compareArea:v},false))));
+  frow.style.marginBottom="16px";
   wrap.appendChild(frow);
 
   const assets=state.compareArea==="all"?src:src.filter(a=>a.area===Number(state.compareArea));
   const isApt=state.compareType==="apt";
-  const activeAssets=assets.filter(a=>getActive(a,tod));
+  const activeAssets=assets.filter(a=>getActiveTenant(a));
 
-  if(activeAssets.length>0) {
-    const ab=div("avg-box mb8");
-    const at=div("section-h mb8"); at.textContent="ממוצעים — "+(isApt?"דירות":"מחסנים")+(state.compareArea!=="all"?" "+state.compareArea+' מ"ר':""); ab.appendChild(at);
-    const amg=div("metrics");
-    const n=activeAssets.length||1;
-    [
-      ["₪"+Math.round(activeAssets.reduce((s,a)=>s+getActive(a,tod).rent,0)/n).toLocaleString(),'שכ"ד ממוצע'],
-      ["₪"+(activeAssets.reduce((s,a)=>s+getActive(a,tod).rent/a.area,0)/n).toFixed(0),'₪/מ"ר ממוצע'],
-      [Math.round(assets.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/(assets.length||1))+"%","תפוסה ממוצעת"],
-    ].forEach(([v,l])=>{ const m=div("metric"); m.innerHTML="<div class='v' style='font-size:18px'>"+v+"</div><div class='l'>"+l+"</div>"; amg.appendChild(m); });
+  if(activeAssets.length>0){
+    const ab=div("avg-box",[]);
+    ab.style.cssText="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px";
+    const at=div("section-h",["ממוצעים — "+(isApt?"דירות":"מחסנים")+(state.compareArea!=="all"?" "+state.compareArea+' מ"ר':"")]);
+    ab.appendChild(at);
+    const amg=div("metrics",[]); const n=activeAssets.length||1;
+    [["₪"+Math.round(activeAssets.reduce((s,a)=>s+Number(getActiveTenant(a).rent||0),0)/n).toLocaleString(),'שכ"ד ממוצע'],["₪"+(activeAssets.reduce((s,a)=>s+Number(getActiveTenant(a).rent||0)/a.area,0)/n).toFixed(0),'₪/מ"ר ממוצע'],[Math.round(assets.reduce((s,a)=>s+calcOcc(a,state.reportFrom,state.reportTo),0)/(assets.length||1))+"%","תפוסה ממוצעת"]].forEach(([v,l])=>{
+      const m=div("metric",[]); m.innerHTML="<div class='v' style='font-size:18px'>"+v+"</div><div class='l'>"+l+"</div>"; amg.appendChild(m);
+    });
     ab.appendChild(amg); wrap.appendChild(ab);
   }
 
-  const cg=div("cmp-grid");
+  const cg=div("cmp-grid",[]);
   assets.forEach(a=>{
-    const active=getActive(a,tod); const occ=calcOcc(a,state.reportFrom,state.reportTo);
-    const cc=div("cmp-card");
-    const ch=div(""); ch.style.display="flex"; ch.style.justifyContent="space-between"; ch.style.marginBottom="6px";
-    ch.appendChild(span("",""+(isApt?"דירה":"מחסן")+" "+a.number)); ch.style.fontWeight="600";
-    ch.appendChild(active?badge("b-green","מושכר"):badge("b-yellow","פנוי"));
+    const at=getActiveTenant(a); const occ=calcOcc(a,state.reportFrom,state.reportTo);
+    const cc=div("cmp-card",[]);
+    const ch=div("",[]); ch.style.cssText="display:flex;justify-content:space-between;margin-bottom:6px;font-weight:600;font-size:15px";
+    ch.appendChild(el("span",{},[(isApt?"דירה":"מחסן")+" "+a.number]));
+    ch.appendChild(at?badge("b-green","מושכר"):badge("b-yellow","פנוי"));
     cc.appendChild(ch);
-    if(active){const nt=div(""); nt.style.fontSize="12px"; nt.style.color="#666"; nt.style.marginBottom="8px"; nt.textContent=active.tenant; cc.appendChild(nt);}
-    const rows=[
-      ["קומה",fmtFloor(a.floor)],["שטח",a.area+' מ"ר'],
-      ...(isApt&&a.balcony>0?[["מרפסת",a.balcony+' מ"ר']]:[]),
-      ...(!isApt&&a.linkedApt?[["דירה קשורה",a.linkedApt]]:[]),
-      ['שכ"ד',active?"₪"+active.rent.toLocaleString():"פנוי"],
-      ['₪/מ"ר',active?"₪"+(active.rent/a.area).toFixed(0):"—"],
-      ...(isApt&&active&&active.vaad?[["ועד","₪"+active.vaad]]:[]),
-      ["תפוסה",occ+"%"],["חוזים",a.leases.length],["חודשים מושכר",totalMonths(a)],
-    ];
-    const rg=div("cmp-rows");
-    rows.forEach(([l,v])=>{ const rc=div("cmp-cell"); rc.innerHTML="<div class='cmp-lbl'>"+l+"</div><div class='cmp-val'>"+v+"</div>"; rg.appendChild(rc); });
-    cc.appendChild(rg);
-    if(active){const df=div(""); df.style.cssText="font-size:11px;color:#888;margin-top:8px;padding-top:8px;border-top:1px solid #eee"; df.textContent=fmtDate(active.start)+" — "+fmtDate(active.end)+" · "+monthsBetween(active.start,active.end)+" חודשים"; cc.appendChild(df);}
-    cg.appendChild(cc);
+    if(at){const nt=div("",[]); nt.style.cssText="font-size:12px;color:#666;margin-bottom:8px"; nt.textContent=at.name; cc.appendChild(nt);}
+    const rows=[["קומה",fmtFloor(a.floor)],["שטח",a.area+' מ"ר'],...(isApt&&a.balcony>0?[["מרפסת",a.balcony+' מ"ר']]:[]),...(!isApt&&a.linkedApt?[["דירה קשורה",a.linkedApt]]:[]),['שכ"ד',at?"₪"+Number(at.rent).toLocaleString():"פנוי"],['₪/מ"ר',at?"₪"+(Number(at.rent)/a.area).toFixed(0):"—"],["תפוסה",occ+"%"],["דיירים",(a.tenants||[]).length]];
+    const rg=div("cmp-rows",[]);
+    rows.forEach(([l,v])=>{const rc=div("cmp-cell",[]); rc.innerHTML="<div class='cmp-lbl'>"+l+"</div><div class='cmp-val'>"+v+"</div>"; rg.appendChild(rc);});
+    cc.appendChild(rg); cg.appendChild(cc);
   });
-  if(assets.length===0){const em=div(""); em.style.color="#aaa"; em.textContent="אין נכסים להשוות"; cg.appendChild(em);}
-  wrap.appendChild(cg);
-  return wrap;
+  if(assets.length===0){const em=div("",["אין נכסים להשוות"]); em.style.color="#aaa"; cg.appendChild(em);}
+  wrap.appendChild(cg); return wrap;
 }
 
-// ── Main Render ──
-function render() {
-  // tabs
+// ── Render ──
+function render(){
   const tabsEl=document.getElementById("tabs");
   tabsEl.innerHTML="";
-  TABS.forEach(t=>{ const b=document.createElement("button"); b.className="tab"+(state.tab===t?" on":""); b.textContent=t; b.onclick=()=>setState({tab:t,showAdd:false,selectedId:null,showAddLease:null,editLease:null}); tabsEl.appendChild(b); });
-
-  // content
-  const app=document.getElementById("app");
-  app.innerHTML="";
+  TABS.forEach(t=>{const b=document.createElement("button");b.className="tab"+(state.tab===t?" on":"");b.textContent=t;b.onclick=()=>setState({tab:t,showAdd:false,selectedId:null},false);tabsEl.appendChild(b);});
+  const app=document.getElementById("app"); app.innerHTML="";
   if(state.tab==="דירות") app.appendChild(renderAssetManager(state.apts,"apt"));
   else if(state.tab==="מחסנים") app.appendChild(renderAssetManager(state.storages,"stor"));
-  else if(state.tab==="ניתוח ודוחות") app.appendChild(renderReport());
+  else if(state.tab==="ניתוח") app.appendChild(renderReport());
   else if(state.tab==="השוואה") app.appendChild(renderCompare());
+  const modal=renderModal(); if(modal) app.appendChild(modal);
 }
 
-render();
+onValue(dataRef,(snapshot)=>{
+  const data=snapshot.val();
+  state.apts=data?.apts||[];
+  state.storages=data?.storages||[];
+  render();
+});
 </script>
 </body>
 </html>
