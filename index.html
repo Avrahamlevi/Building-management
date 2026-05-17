@@ -74,7 +74,9 @@ tr:nth-child(even) td{background:#fafafa}
 <body>
 
 <h1>🏢 מערכת ניהול בניין</h1>
-<div id="sub" class="sub"></div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+  <button class="btn btn-sm" style="font-size:11px;color:#aaa;border-color:#eee" onclick="if(confirm('למחוק את כל הנתונים ולהתחיל מחדש?')){localStorage.removeItem('building_mgr_v1');location.reload();}">🗑 נקה הכל</button>
+</div>
 
 <div class="tabs" id="tabs"></div>
 <div id="app"></div>
@@ -111,11 +113,26 @@ const getActive = (asset,d) => asset.leases.find(l=>l.start<=d&&l.end>=d)||null;
 const totalMonths = a => a.leases.reduce((s,l)=>s+monthsBetween(l.start,l.end),0);
 const uid = () => Date.now()+Math.random().toString(36).slice(2);
 
+// ── שמירה וטעינה מ-localStorage ──
+const STORAGE_KEY = "building_mgr_v1";
+function loadSaved() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+function saveData(apts, storages) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({apts, storages})); } catch(e) {}
+}
+
+const saved = loadSaved();
+
 // ── State ──
 let state = {
   tab: "דירות",
-  apts: APTS,
-  storages: STORAGES,
+  apts: saved ? saved.apts : APTS,
+  storages: saved ? saved.storages : STORAGES,
   selectedId: null,
   showAdd: false,
   showAddLease: null,
@@ -133,7 +150,11 @@ let state = {
 
 const TABS = ["דירות","מחסנים","ניתוח ודוחות","השוואה"];
 
-function setState(patch) { Object.assign(state,patch); render(); }
+function setState(patch) {
+  Object.assign(state, patch);
+  saveData(state.apts, state.storages);
+  render();
+}
 
 // ── HTML helpers ──
 const h = (tag,attrs,inner) => {
@@ -443,9 +464,6 @@ function renderCompare() {
 
 // ── Main Render ──
 function render() {
-  // subtitle
-  document.getElementById("sub").textContent="נכון ל‑"+fmtDate(today());
-
   // tabs
   const tabsEl=document.getElementById("tabs");
   tabsEl.innerHTML="";
