@@ -90,13 +90,12 @@ tr:nth-child(even) td{background:#fafafa}
 <div id="app"><div class="loading">⏳ טוען נתונים...</div></div>
 <div class="saving" id="saving">💾 שומר...</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const app = initializeApp({ databaseURL:"https://building-management-a4899-default-rtdb.firebaseio.com" });
-const db = getDatabase(app);
-const dataRef = ref(db, "building2");
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const app = firebase.initializeApp({ databaseURL:"https://building-management-a4899-default-rtdb.firebaseio.com" });
+const db = firebase.database();
+const dataRef = db.ref("building2");
 
 const APT_FLOORS = [0,1,2,3,4,5,6,7];
 const STOR_FLOORS = [-1,-2];
@@ -137,7 +136,7 @@ function saveDB(){
   document.getElementById("saving").style.display="block";
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
-    set(dataRef,{apts:state.apts,storages:state.storages})
+    dataRef.set({apts:state.apts,storages:state.storages})
       .finally(()=>document.getElementById("saving").style.display="none");
   },600);
 }
@@ -393,7 +392,10 @@ function renderAssetManager(assets, type){
     const na=state.newAsset;
     grid.appendChild(colDiv("מס' "+typeLabel, inp("text",na.number,v=>setState({newAsset:{...state.newAsset,number:v}},false))));
     grid.appendChild(colDiv("קומה", sel([["","בחר"],...floorOpts.map(f=>[f,fmtFloor(f)])],na.floor,v=>setState({newAsset:{...state.newAsset,floor:v}},false))));
-    grid.appendChild(colDiv('שטח מ"ר', inp("number",na.area,v=>setState({newAsset:{...state.newAsset,area:v}},false))));
+    const AREA_OPTIONS_APT = [30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150];
+    const AREA_OPTIONS_STOR = [3,4,5,6,7,8,9,10,12,15,20];
+    const areaOpts = isApt ? AREA_OPTIONS_APT : AREA_OPTIONS_STOR;
+    grid.appendChild(colDiv('שטח מ"ר', sel([["","בחר שטח"],...areaOpts.map(a=>[a,a+' מ"ר'])],na.area,v=>setState({newAsset:{...state.newAsset,area:v}},false))));
     if(isApt) grid.appendChild(colDiv('מרפסת מ"ר', inp("number",na.balcony,v=>setState({newAsset:{...state.newAsset,balcony:v}},false))));
     else grid.appendChild(colDiv("קשור לדירה", sel([["","ללא"],...aptNums.map(n=>[n,"דירה "+n])],na.linkedApt,v=>setState({newAsset:{...state.newAsset,linkedApt:v}},false))));
     form.appendChild(grid);
@@ -411,7 +413,7 @@ function renderAssetManager(assets, type){
   }
 
   if(filtered.length===0){
-    const em=div("empty",["אין "+typeLabel+"ות. לחץ '+ הוסף "+typeLabel+"' כדי להתחיל."]);
+    const em=div("empty",["אין "+typeLabel+"ות עדיין. לחץ '+ הוסף "+typeLabel+"' כדי להתחיל."]);
     wrap.appendChild(em);
   }
 
@@ -705,7 +707,7 @@ function render(){
   const modal=renderModal(); if(modal) app.appendChild(modal);
 }
 
-onValue(dataRef,(snapshot)=>{
+dataRef.on("value",(snapshot)=>{
   const data=snapshot.val();
   state.apts=data?.apts||[];
   state.storages=data?.storages||[];
