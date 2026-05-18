@@ -77,6 +77,27 @@ td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 </div>
 <div class="saving" id="saving">💾 שומר...</div>
 <script>
+const CLOUDINARY_CLOUD = "db9yvfsfj";
+const CLOUDINARY_PRESET = "ml_default";
+
+async function uploadToCloudinary(file, onProgress){
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`);
+  return new Promise((resolve, reject)=>{
+    xhr.upload.onprogress = e => { if(onProgress && e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100)); };
+    xhr.onload = () => {
+      const res = JSON.parse(xhr.responseText);
+      if(res.secure_url) resolve({url: res.secure_url, name: file.name, type: file.type});
+      else reject(new Error("העלאה נכשלה"));
+    };
+    xhr.onerror = () => reject(new Error("שגיאת רשת"));
+    xhr.send(formData);
+  });
+}
+
 // ── קבועים ──
 const APT_FLOORS=[0,1,2,3,4,5,6,7];
 const STOR_FLOORS=[-1,-2];
@@ -174,53 +195,105 @@ function renderModal(){
 function tenantForm(init,title,onSave){
   const d={name:"",phone:"",email:"",idNum:"",startDate:"",endDate:"",
            rent:"",vaad:"",deposit:"",notes:"",docs:[],...(init||{})};
-  let dName="",dUrl="";
+  // עותק עמוק של docs
+  d.docs=JSON.parse(JSON.stringify(d.docs||[]));
+
   const wrap=D("");
-  function build(){
-    wrap.innerHTML="";
-    wrap.appendChild(mk("h3",{style:"font-size:15px;font-weight:700;margin-bottom:14px",txt:title}));
-    const g=D("grid g3");
-    [["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
-     ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
-     ["תאריך יציאה","endDate","date"],['שכ"ד ₪',"rent","number"],
-     ["ועד בית ₪","vaad","number"],["פיקדון ₪","deposit","number"]
-    ].forEach(([l,k,t])=>g.appendChild(Col(l,Inp(t,d[k],v=>{d[k]=v;}))));
-    wrap.appendChild(g);
-    wrap.appendChild(mk("hr",{cls:"sep"}));
-    wrap.appendChild(D("",[Lbl("הערות"),Ta(d.notes,v=>{d.notes=v;},"הערות חופשיות...")]));
-    wrap.appendChild(mk("hr",{cls:"sep"}));
-    wrap.appendChild(mk("p",{style:"font-size:13px;font-weight:600;margin-bottom:6px",txt:"📎 הסכם שכירות ומסמכים"}));
-    wrap.appendChild(mk("p",{cls:"muted",style:"margin-bottom:8px",txt:"1. העלה לגוגל דרייב  2. שתף  3. העתק קישור  4. הדבק כאן"}));
-    (d.docs||[]).forEach((doc,i)=>{
+  wrap.appendChild(mk("h3",{style:"font-size:15px;font-weight:700;margin-bottom:14px",txt:title}));
+
+  // שדות טקסט - כל אחד עצמאי, ללא re-render
+  const g=D("grid g3");
+  const fields=[["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
+   ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
+   ["תאריך יציאה","endDate","date"],['שכ"ד ₪',"rent","number"],
+   ["ועד בית ₪","vaad","number"],["פיקדון ₪","deposit","number"]];
+  fields.forEach(([l,k,t])=>{
+    const inp=mk("input",{type:t,placeholder:""});
+    inp.value=d[k]||"";
+    inp.oninput=ev=>{d[k]=ev.target.value;};
+    g.appendChild(Col(l,inp));
+  });
+  wrap.appendChild(g);
+  wrap.appendChild(mk("hr",{cls:"sep"}));
+
+  const noteLbl=Lbl("הערות");
+  const noteTa=mk("textarea",{placeholder:"הערות חופשיות..."});
+  noteTa.value=d.notes||"";noteTa.oninput=ev=>{d.notes=ev.target.value;};
+  wrap.appendChild(D("",[noteLbl,noteTa]));
+  wrap.appendChild(mk("hr",{cls:"sep"}));
+
+  // מסמכים - העלאה ישירה
+  wrap.appendChild(mk("p",{style:"font-size:13px;font-weight:600;margin-bottom:6px",txt:"📎 הסכם שכירות / תמונות"}));
+  const docList=D("",{style:"margin-bottom:8px"});
+  function refreshDocs(){
+    docList.innerHTML="";
+    d.docs.forEach((doc,i)=>{
       const row=D("doc");
-      row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:"📄 "+doc.name}));
-      row.appendChild(Btn("red sm","✕",()=>{d.docs.splice(i,1);build();}));
-      wrap.appendChild(row);
+      const isImg = doc.type && doc.type.startsWith("image/");
+      if(isImg){
+        row.appendChild(mk("img",{src:doc.url,style:"max-height:50px;border-radius:4px;margin-left:8px;vertical-align:middle"}));
+      }
+      row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:(isImg?"🖼 ":"📄 ")+doc.name}));
+      row.appendChild(Btn("red sm","✕",()=>{d.docs.splice(i,1);refreshDocs();}));
+      docList.appendChild(row);
     });
-    const dr=D("row");
-    const ni=Inp("text",dName,v=>{dName=v;},"שם המסמך");
-    const ui=Inp("text",dUrl,v=>{dUrl=v;},"קישור גוגל דרייב");
-    const dc=D("col");dc.appendChild(Lbl("שם"));dc.appendChild(ni);
-    const uc=D("col");uc.appendChild(Lbl("קישור"));uc.appendChild(ui);
-    dr.appendChild(dc);dr.appendChild(uc);
-    dr.appendChild(Btn("gray sm","+ הוסף",()=>{
-      if(!dName.trim()||!dUrl.trim())return;
-      if(!d.docs)d.docs=[];
-      d.docs.push({id:uid(),name:dName.trim(),url:dUrl.trim()});
-      dName="";dUrl="";build();
-    }));
-    wrap.appendChild(dr);
-    wrap.appendChild(mk("hr",{cls:"sep"}));
-    const brow=D("row");
-    brow.appendChild(Btn("green","✅ שמור דייר",()=>{
-      if(!d.name||!d.startDate||!d.rent)return alert("חובה: שם, תאריך כניסה, שכ\"ד");
-      onSave({...d,id:d.id||uid(),status:d.status||"active",
-              rent:Number(d.rent)||0,vaad:Number(d.vaad)||0,deposit:Number(d.deposit)||0});
-    }));
-    brow.appendChild(Btn("gray","ביטול",closeModal));
-    wrap.appendChild(brow);
   }
-  build();return wrap;
+  refreshDocs();
+  wrap.appendChild(docList);
+
+  const progressDiv=mk("p",{cls:"muted",style:"margin-bottom:8px",txt:""});
+  wrap.appendChild(progressDiv);
+
+  const fileInp=mk("input",{type:"file",accept:"image/*,.pdf,.doc,.docx"});
+  fileInp.style.display="none";
+  fileInp.onchange=async ev=>{
+    const file=ev.target.files[0];if(!file)return;
+    if(file.size>10*1024*1024)return alert("הקובץ גדול מדי — מקסימום 10MB");
+    progressDiv.textContent="⏳ מעלה... 0%";
+    try{
+      const result = await uploadToCloudinary(file, pct=>{progressDiv.textContent="⏳ מעלה... "+pct+"%";});
+      d.docs.push({id:uid(), name:result.name, url:result.url, type:result.type});
+      progressDiv.textContent="✅ הועלה בהצלחה!";
+      setTimeout(()=>{progressDiv.textContent="";},2000);
+      refreshDocs();
+    }catch(e){
+      progressDiv.textContent="❌ שגיאה: "+e.message;
+    }
+    fileInp.value="";
+  };
+  wrap.appendChild(fileInp);
+  const uploadRow=D("row");
+  uploadRow.appendChild(Btn("gray","📁 בחר קובץ",()=>fileInp.click()));
+  const camInp=mk("input",{type:"file",accept:"image/*",capture:"environment"});
+  camInp.style.display="none";
+  camInp.onchange=async ev=>{
+    const file=ev.target.files[0];if(!file)return;
+    progressDiv.textContent="⏳ מעלה תמונה...";
+    try{
+      const result = await uploadToCloudinary(file, pct=>{progressDiv.textContent="⏳ מעלה... "+pct+"%";});
+      d.docs.push({id:uid(), name:result.name, url:result.url, type:result.type});
+      progressDiv.textContent="✅ הועלה בהצלחה!";
+      setTimeout(()=>{progressDiv.textContent="";},2000);
+      refreshDocs();
+    }catch(e){
+      progressDiv.textContent="❌ שגיאה: "+e.message;
+    }
+    camInp.value="";
+  };
+  wrap.appendChild(camInp);
+  uploadRow.appendChild(Btn("gray","📷 צלם תמונה",()=>camInp.click()));
+  wrap.appendChild(uploadRow);
+
+  wrap.appendChild(mk("hr",{cls:"sep"}));
+  const brow=D("row");
+  brow.appendChild(Btn("green","✅ שמור דייר",()=>{
+    if(!d.name||!d.startDate||!d.rent)return alert("חובה: שם, תאריך כניסה, שכ\"ד");
+    onSave({...d,id:d.id||uid(),status:d.status||"active",
+            rent:Number(d.rent)||0,vaad:Number(d.vaad)||0,deposit:Number(d.deposit)||0});
+  }));
+  brow.appendChild(Btn("gray","ביטול",closeModal));
+  wrap.appendChild(brow);
+  return wrap;
 }
 
 // ── טופס סגירת חשבון ──
@@ -261,34 +334,93 @@ function renderAssets(type){
   const filtered=assets.filter(a=>(fa==="all"||a.area===Number(fa))&&(ff==="all"||a.floor===Number(ff)));
   const wrap=D("");
 
-  // פילטרים
+  // פילטרים - רק קומה
   const fr=D("row");fr.style.marginBottom="12px";
-  fr.appendChild(Col("שטח",Sel([["all","הכל"],...allAreas.map(a=>[a,a+' מ"ר'])],fa,v=>set({fArea:{...S.fArea,[type]:v}},false))));
   fr.appendChild(Col("קומה",Sel([["all","הכל"],...floors.map(f=>[f,fmtFloor(f)])],ff,v=>set({fFloor:{...S.fFloor,[type]:v}},false))));
   const ab=Btn("blue","+ הוסף "+lbl,()=>set({showAdd:S.showAdd===type?null:type,sel:null},false));
   ab.style.marginRight="auto";fr.appendChild(ab);
   wrap.appendChild(fr);
 
-  // טופס הוספה
+  // טופס הוספה - ללא re-render בכל הקלדה
   if(S.showAdd===type){
     const fp=D("fpanel");
     fp.appendChild(mk("p",{style:"font-size:14px;font-weight:700;margin-bottom:12px",txt:lbl+" חדש"}));
-    const na=S.newA;
+
+    // אובייקט מקומי - לא נוגע ב-state עד שמור
+    const na={number:"",floor:"",area:"",balcony:"",linkedApt:"",rent:"",docs:[],_dname:"",_durl:""};
+
     const g=D("grid g3");
-    g.appendChild(Col("מס' "+lbl,Inp("text",na.number,v=>set({newA:{...S.newA,number:v}},false),"לדוג' 101")));
-    g.appendChild(Col("קומה",Sel([["","בחר"],...floors.map(f=>[f,fmtFloor(f)])],na.floor,v=>set({newA:{...S.newA,floor:v}},false))));
-    g.appendChild(Col('שטח דירה מ"ר',Inp("number",na.area,v=>set({newA:{...S.newA,area:v}},false),"לדוג' 65")));
-    if(isApt) g.appendChild(Col('שטח מרפסת מ"ר',Inp("number",na.balcony,v=>set({newA:{...S.newA,balcony:v}},false),"0 אם אין")));
-    else g.appendChild(Col("קשור לדירה",Sel([["","ללא"],...S.apts.map(a=>[a.number,"דירה "+a.number])],na.linkedApt,v=>set({newA:{...S.newA,linkedApt:v}},false))));
+
+    const numInp=Inp("text","","",  "לדוג' 101");numInp.oninput=ev=>{na.number=ev.target.value;};
+    g.appendChild(Col("מס' "+lbl,numInp));
+
+    const floorSel=Sel([["","בחר"],...floors.map(f=>[f,fmtFloor(f)])], "",v=>{na.floor=v;});
+    g.appendChild(Col("קומה",floorSel));
+
+    const areaInp=Inp("number","","","לדוג' 65");areaInp.oninput=ev=>{na.area=ev.target.value;};
+    g.appendChild(Col('שטח דירה מ"ר',areaInp));
+
+    if(isApt){
+      const balcInp=Inp("number","","","0 אם אין");balcInp.oninput=ev=>{na.balcony=ev.target.value;};
+      g.appendChild(Col('שטח מרפסת מ"ר',balcInp));
+      const rentInp=Inp("number","","","₪ לחודש");rentInp.oninput=ev=>{na.rent=ev.target.value;};
+      g.appendChild(Col('שכר דירה ₪',rentInp));
+    } else {
+      const aptSel=Sel([["","ללא"],...S.apts.map(a=>[a.number,"דירה "+a.number])],"",v=>{na.linkedApt=v;});
+      g.appendChild(Col("קשור לדירה",aptSel));
+      const rentInp=Inp("number","","","₪ לחודש");rentInp.oninput=ev=>{na.rent=ev.target.value;};
+      g.appendChild(Col('שכר דירה ₪',rentInp));
+    }
     fp.appendChild(g);
+
+    // העלאת קבצים - Cloudinary
+    fp.appendChild(mk("hr",{cls:"sep"}));
+    fp.appendChild(mk("p",{style:"font-size:13px;font-weight:600;margin-bottom:6px",txt:"📎 הסכם שכירות / תמונות"}));
+    const docList2=D("",{style:"margin-bottom:6px"});
+    function refreshDocs2(){
+      docList2.innerHTML="";
+      na.docs.forEach((doc,i)=>{
+        const row=D("doc");
+        const isImg=doc.type&&doc.type.startsWith("image/");
+        if(isImg) row.appendChild(mk("img",{src:doc.url,style:"max-height:40px;border-radius:4px;margin-left:8px;vertical-align:middle"}));
+        row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:(isImg?"🖼 ":"📄 ")+doc.name}));
+        row.appendChild(Btn("red sm","✕",()=>{na.docs.splice(i,1);refreshDocs2();}));
+        docList2.appendChild(row);
+      });
+    }
+    fp.appendChild(docList2);
+    const prog2=mk("p",{cls:"muted",style:"margin-bottom:6px",txt:""});
+    fp.appendChild(prog2);
+    async function handleUpload2(file){
+      if(!file)return;
+      if(file.size>10*1024*1024)return alert("מקסימום 10MB");
+      prog2.textContent="⏳ מעלה... 0%";
+      try{
+        const r=await uploadToCloudinary(file,p=>{prog2.textContent="⏳ מעלה... "+p+"%";});
+        na.docs.push({id:uid(),name:r.name,url:r.url,type:r.type});
+        prog2.textContent="✅ הועלה!";setTimeout(()=>{prog2.textContent="";},2000);
+        refreshDocs2();
+      }catch(e){prog2.textContent="❌ "+e.message;}
+    }
+    const fi2=mk("input",{type:"file",accept:"image/*,.pdf,.doc,.docx"});fi2.style.display="none";
+    fi2.onchange=ev=>{handleUpload2(ev.target.files[0]);fi2.value="";};
+    const ci2=mk("input",{type:"file",accept:"image/*",capture:"environment"});ci2.style.display="none";
+    ci2.onchange=ev=>{handleUpload2(ev.target.files[0]);ci2.value="";};
+    fp.appendChild(fi2);fp.appendChild(ci2);
+    const ur2=D("row");
+    ur2.appendChild(Btn("gray","📁 בחר קובץ",()=>fi2.click()));
+    ur2.appendChild(Btn("gray","📷 צלם תמונה",()=>ci2.click()));
+    fp.appendChild(ur2);
+
+    fp.appendChild(mk("hr",{cls:"sep"}));
     const brow=D("row");
     brow.appendChild(Btn("blue","שמור",()=>{
-      const n=S.newA;
-      if(!n.number||n.floor===""||!n.area)return alert("חובה: מספר, קומה, שטח");
-      const item={id:uid(),number:n.number,floor:Number(n.floor),area:Number(n.area),
-                  balcony:Number(n.balcony||0),linkedApt:n.linkedApt||"",tenants:[]};
+      if(!na.number||na.floor===""||!na.area)return alert("חובה: מספר, קומה, שטח");
+      const item={id:uid(),number:na.number,floor:Number(na.floor),area:Number(na.area),
+                  balcony:Number(na.balcony||0),linkedApt:na.linkedApt||"",
+                  rent:Number(na.rent||0),docs:[...na.docs],tenants:[]};
       const k=isApt?"apts":"storages";
-      set({[k]:[...S[k],item],showAdd:null,newA:{number:"",floor:"",area:"",balcony:"",linkedApt:""}});
+      set({[k]:[...S[k],item],showAdd:null});
     }));
     brow.appendChild(Btn("gray","ביטול",()=>set({showAdd:null},false)));
     fp.appendChild(brow);
@@ -312,6 +444,7 @@ function renderAssets(type){
     top.appendChild(Bdg("bgr",asset.area+' מ"ר'));
     if(isApt&&Number(asset.balcony)>0)top.appendChild(Bdg("bgr","מרפסת "+asset.balcony+' מ"ר'));
     if(!isApt&&asset.linkedApt)top.appendChild(Bdg("bb","דירה "+asset.linkedApt));
+    if(asset.rent&&Number(asset.rent)>0)top.appendChild(Bdg("bb","₪"+Number(asset.rent).toLocaleString()));
     top.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
     info.appendChild(top);
     const sub=mk("div",{cls:"muted"});
@@ -321,9 +454,9 @@ function renderAssets(type){
     info.appendChild(sub);
     const head=mk("div",{style:"display:flex;align-items:center;gap:10px"});
     head.appendChild(nb);head.appendChild(info);
-    head.appendChild(Btn("red sm","🗑",e=>{
+    head.appendChild(Btn("red sm","🗑 מחק",e=>{
       e.stopPropagation();
-      if(confirm("למחוק "+lbl+" "+asset.number+"?")){
+      if(confirm("⚠️ האם למחוק "+lbl+" "+asset.number+" לצמיתות?\nכל הדיירים וההיסטוריה יימחקו.")){
         const k=isApt?"apts":"storages";
         set({[k]:S[k].filter(a=>a.id!==asset.id),sel:null});
       }
@@ -341,6 +474,17 @@ function renderAssets(type){
           closeModal();
         }));
       }));
+
+      if((asset.docs||[]).length>0){
+        det.appendChild(mk("p",{style:"font-size:12px;font-weight:600;margin:10px 0 5px",txt:"📎 מסמכים ותמונות"}));
+        (asset.docs||[]).forEach(doc=>{
+          const row=D("doc");
+          row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:"📄 "+doc.name}));
+          row.appendChild(mk("span",{cls:"muted",txt:" ↗"}));
+          det.appendChild(row);
+        });
+        det.appendChild(mk("hr",{cls:"sep"}));
+      }
 
       const tenants=[...(asset.tenants||[])].sort((a,b)=>{
         if(a.status==="active")return -1;if(b.status==="active")return 1;
@@ -404,8 +548,8 @@ function renderAssets(type){
             closeModal();
           }));
         }));
-        ab.appendChild(Btn("red sm","🗑 מחק",()=>{
-          if(confirm("למחוק דייר זה?")){
+        ab.appendChild(Btn("red sm","🗑 מחק דייר",()=>{
+          if(confirm("⚠️ האם למחוק את הדייר "+t.name+" לצמיתות?\nהנתונים לא יניתנו לשחזור.")){
             updAsset(type,asset.id,a=>({...a,tenants:a.tenants.filter(x=>x.id!==t.id)}));
           }
         }));
