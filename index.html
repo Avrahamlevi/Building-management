@@ -66,6 +66,13 @@ td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 .modal{background:#fff;border-radius:12px;padding:20px;max-width:600px;width:100%;max-height:92vh;overflow-y:auto}
 .alert-y{background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:10px 14px;font-size:13px;color:#713f12;margin-bottom:12px}
 .saving{position:fixed;bottom:20px;right:20px;background:#1e3a5f;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;z-index:200;display:none}
+.login-screen{position:fixed;inset:0;background:#1e3a5f;display:flex;align-items:center;justify-content:center;z-index:9999;direction:rtl}
+.login-box{background:#fff;border-radius:16px;padding:32px;width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.login-box h2{font-size:22px;margin-bottom:6px;color:#1e3a5f}
+.login-box p{font-size:13px;color:#888;margin-bottom:20px}
+.login-box input{padding:10px 14px;border:2px solid #ddd;border-radius:8px;font-size:16px;width:100%;margin-bottom:12px;text-align:center;letter-spacing:4px}
+.login-box input:focus{border-color:#2563eb;outline:none}
+.login-err{color:#dc2626;font-size:13px;margin-bottom:10px;min-height:18px}
 .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
@@ -101,8 +108,43 @@ async function uploadToCloudinary(file, onProgress){
 // ── קבועים ──
 const APT_FLOORS=[0,1,2,3,4,5,6,7];
 const STOR_FLOORS=[-1,-2];
-const TABS=["דירות","מחסנים","ניתוח","השוואה"];
+const TABS=["דירות","מחסנים","ניתוח","השוואה","אבטחה"];
 const KEY="bldg_v5";
+const PWD_KEY="bldg_pwd";
+
+// ── סיסמה ──
+function getPassword(){ return localStorage.getItem(PWD_KEY)||"1977"; }
+function isLoggedIn(){ return sessionStorage.getItem("auth")==="ok"; }
+
+function showLoginScreen(){
+  const screen=document.createElement("div");
+  screen.className="login-screen";
+  screen.id="login-screen";
+  screen.innerHTML=`
+    <div class="login-box">
+      <h2>🏢 ניהול בניין</h2>
+      <p>הכנס סיסמה כדי להיכנס</p>
+      <input type="password" id="pwd-inp" placeholder="••••" autocomplete="off"/>
+      <div class="login-err" id="login-err"></div>
+      <button class="btn blue" style="width:100%;padding:10px" onclick="tryLogin()">כניסה</button>
+    </div>`;
+  document.body.appendChild(screen);
+  document.getElementById("pwd-inp").focus();
+  document.getElementById("pwd-inp").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin();});
+}
+
+window.tryLogin=function(){
+  const val=document.getElementById("pwd-inp").value;
+  if(val===getPassword()){
+    sessionStorage.setItem("auth","ok");
+    document.getElementById("login-screen").remove();
+    render();
+  } else {
+    document.getElementById("login-err").textContent="❌ סיסמה שגויה, נסה שוב";
+    document.getElementById("pwd-inp").value="";
+    document.getElementById("pwd-inp").focus();
+  }
+};
 
 const fmtFloor=f=>f===0?"קומת קרקע":f<0?`קומה מינוס ${Math.abs(f)}`:`קומה ${f}`;
 const fmtDate=d=>d?new Date(d).toLocaleDateString("he-IL"):"—";
@@ -666,10 +708,46 @@ function render(){
   else if(S.tab==="מחסנים")c=renderAssets("stor");
   else if(S.tab==="ניתוח")c=renderReport();
   else if(S.tab==="השוואה")c=renderCompare();
+  else if(S.tab==="אבטחה"){
+    const wrap=D("");
+    wrap.appendChild(mk("p",{style:"font-weight:700;font-size:16px;margin-bottom:16px",txt:"🔒 הגדרות אבטחה"}));
+    const card=D("card");
+    card.appendChild(mk("p",{style:"font-weight:600;font-size:14px;margin-bottom:12px",txt:"שינוי סיסמה"}));
+    const g=D("grid g2");
+    const cur=mk("input",{type:"password",placeholder:"סיסמה נוכחית"});
+    const n1=mk("input",{type:"password",placeholder:"סיסמה חדשה"});
+    const n2=mk("input",{type:"password",placeholder:"אימות סיסמה חדשה"});
+    g.appendChild(Col("סיסמה נוכחית",cur));
+    g.appendChild(Col("סיסמה חדשה",n1));
+    g.appendChild(Col("אימות סיסמה חדשה",n2));
+    card.appendChild(g);
+    const msg=mk("p",{style:"font-size:13px;margin:8px 0;min-height:18px",txt:""});
+    card.appendChild(msg);
+    card.appendChild(Btn("blue","שמור סיסמה חדשה",()=>{
+      if(cur.value!==getPassword()){msg.style.color="#dc2626";msg.textContent="❌ הסיסמה הנוכחית שגויה";return;}
+      if(!n1.value){msg.style.color="#dc2626";msg.textContent="❌ נא להזין סיסמה חדשה";return;}
+      if(n1.value!==n2.value){msg.style.color="#dc2626";msg.textContent="❌ הסיסמאות החדשות לא תואמות";return;}
+      localStorage.setItem(PWD_KEY,n1.value);
+      msg.style.color="#16a34a";msg.textContent="✅ הסיסמה שונתה בהצלחה!";
+      cur.value="";n1.value="";n2.value="";
+    }));
+    wrap.appendChild(card);
+
+    const card2=D("card");
+    card2.style.marginTop="10px";
+    card2.appendChild(mk("p",{style:"font-weight:600;font-size:14px;margin-bottom:8px",txt:"יציאה מהמערכת"}));
+    card2.appendChild(mk("p",{cls:"muted",style:"margin-bottom:12px",txt:"לחץ לצאת ולנעול את המערכת"}));
+    card2.appendChild(Btn("red","🔒 יציאה",()=>{
+      sessionStorage.removeItem("auth");
+      location.reload();
+    }));
+    wrap.appendChild(card2);
+    c=wrap;
+  }
   if(c)app.appendChild(c);
   const m=renderModal();if(m)app.appendChild(m);
 }
-render();
+if(!isLoggedIn()){ showLoginScreen(); } else { render(); }
 </script>
 </body>
 </html>
