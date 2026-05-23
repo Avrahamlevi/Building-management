@@ -114,7 +114,7 @@ const PWD_KEY="bldg_pwd";
 
 // ── סיסמה ──
 function getPassword(){ return localStorage.getItem(PWD_KEY)||"1977"; }
-function isLoggedIn(){ return sessionStorage.getItem("auth")==="ok"; }
+function isLoggedIn(){ return false; }
 
 function showLoginScreen(){
   const screen=document.createElement("div");
