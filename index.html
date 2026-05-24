@@ -106,11 +106,49 @@ async function uploadToCloudinary(file, onProgress){
 }
 
 // ── קבועים ──
-const APT_FLOORS=[0,1,2,3,4,5,6,7];
-const STOR_FLOORS=[-1,-2];
-const TABS=["דירות","מחסנים","ניתוח","השוואה","אבטחה"];
-const KEY="bldg_v5";
+const APT_FLOORS=[-2,-1,1,2,3,4];
+const TABS=["דירות","ניתוח","השוואה","אבטחה"];
+const KEY="bldg_v6";
 const PWD_KEY="bldg_pwd";
+
+// ── נתוני דירות אמיתיים ──
+const INITIAL_APTS=[
+  {id:"d1", number:"1",  floor:-2, area:64.3, balcony:0,    sukkah:0,   note:"דירת גן",     tenants:[], docs:[]},
+  {id:"d2", number:"2",  floor:-2, area:38,   balcony:0,    sukkah:0,   note:"דירת גן",     tenants:[], docs:[]},
+  {id:"d3", number:"3",  floor:-1, area:38,   balcony:6.75, sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d4", number:"4",  floor:-1, area:64.3, balcony:6.75, sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d5", number:"5",  floor:-1, area:64.3, balcony:0,    sukkah:0,   note:"דירת גן",     tenants:[], docs:[]},
+  {id:"d6", number:"6",  floor:-1, area:38,   balcony:0,    sukkah:0,   note:"דירת גן",     tenants:[], docs:[]},
+  {id:"d7", number:"7",  floor:1,  area:38,   balcony:11.4, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d8", number:"8",  floor:1,  area:64.3, balcony:12.2, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d9", number:"9",  floor:1,  area:64.3, balcony:12.2, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d10",number:"10", floor:1,  area:38,   balcony:10.2, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d11",number:"11", floor:1,  area:38,   balcony:13,   sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d12",number:"12", floor:1,  area:64.3, balcony:11.8, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d13",number:"13", floor:1,  area:64.3, balcony:13.2, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d14",number:"14", floor:1,  area:38,   balcony:11.8, sukkah:1.6, note:"",             tenants:[], docs:[]},
+  {id:"d15",number:"15", floor:2,  area:38,   balcony:9.6,  sukkah:3,   note:"",             tenants:[], docs:[]},
+  {id:"d16",number:"16", floor:2,  area:64.3, balcony:10.8, sukkah:4,   note:"",             tenants:[], docs:[]},
+  {id:"d17",number:"17", floor:2,  area:64.3, balcony:10.8, sukkah:4,   note:"",             tenants:[], docs:[]},
+  {id:"d18",number:"18", floor:2,  area:38,   balcony:9.8,  sukkah:3,   note:"",             tenants:[], docs:[]},
+  {id:"d19",number:"19", floor:2,  area:38,   balcony:10.2, sukkah:2.2, note:"",             tenants:[], docs:[]},
+  {id:"d20",number:"20", floor:2,  area:64.3, balcony:12,   sukkah:3,   note:"",             tenants:[], docs:[]},
+  {id:"d21",number:"21", floor:2,  area:64.3, balcony:11.6, sukkah:3,   note:"",             tenants:[], docs:[]},
+  {id:"d22",number:"22", floor:2,  area:38,   balcony:0,    sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d23",number:"23", floor:3,  area:38,   balcony:6.8,  sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d24",number:"24", floor:3,  area:64.3, balcony:6.8,  sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d25",number:"25", floor:3,  area:64.3, balcony:6.8,  sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d26",number:"26", floor:3,  area:38,   balcony:6.8,  sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d27",number:"27", floor:3,  area:38,   balcony:8.2,  sukkah:2.2, note:"",             tenants:[], docs:[]},
+  {id:"d28",number:"28", floor:3,  area:64.3, balcony:8.8,  sukkah:2.8, note:"",             tenants:[], docs:[]},
+  {id:"d29",number:"29", floor:3,  area:64.3, balcony:8.8,  sukkah:2.8, note:"",             tenants:[], docs:[]},
+  {id:"d30",number:"30", floor:3,  area:38,   balcony:8.2,  sukkah:2.2, note:"",             tenants:[], docs:[]},
+  {id:"d31",number:"31", floor:4,  area:86,   balcony:20,   sukkah:0,   note:"דירה לנוף",   tenants:[], docs:[]},
+  {id:"d32",number:"32", floor:4,  area:86,   balcony:20,   sukkah:0,   note:"דירה לנוף",   tenants:[], docs:[]},
+  {id:"d33",number:"33", floor:4,  area:38,   balcony:4.1,  sukkah:0,   note:"",             tenants:[], docs:[]},
+  {id:"d34",number:"34", floor:4,  area:94,   balcony:12,   sukkah:0,   note:'דירה + 2 מרפסות, מרפסת נוספת מחדר שינה 4 מ"ר', tenants:[], docs:[]},
+  {id:"d35",number:"35", floor:4,  area:62.5, balcony:8.2,  sukkah:0,   note:"",             tenants:[], docs:[]},
+];
 
 // ── סיסמה ──
 function getPassword(){ return localStorage.getItem(PWD_KEY)||"1977"; }
@@ -169,17 +207,18 @@ const calcOcc=(a,from,to)=>{
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
 function save(){
   document.getElementById("saving").style.display="block";
-  try{localStorage.setItem(KEY,JSON.stringify({apts:S.apts,storages:S.storages}));}catch(e){}
+  try{localStorage.setItem(KEY,JSON.stringify({apts:S.apts}));}catch(e){}
   setTimeout(()=>document.getElementById("saving").style.display="none",700);
 }
 const saved=load();
 const S={
-  tab:"דירות",apts:saved?.apts||[],storages:saved?.storages||[],
+  tab:"דירות",
+  apts:saved?.apts||(()=>{localStorage.setItem(KEY,JSON.stringify({apts:INITIAL_APTS,storages:[]}));return INITIAL_APTS;})(),
   sel:null,showAdd:null,expanded:{},modal:null,
-  fArea:{apt:"all",stor:"all"},fFloor:{apt:"all",stor:"all"},
-  newA:{number:"",floor:"",area:"",balcony:"",linkedApt:""},
+  fFloor:"all",
+  newA:{number:"",floor:"",area:"",balcony:"",note:""},
   repFrom:new Date().getFullYear()+"-01-01",repTo:new Date().getFullYear()+"-12-31",
-  cmpType:"apt",cmpArea:"all"
+  cmpArea:"all"
 };
 function set(p,doSave=true){Object.assign(S,p);if(doSave)save();render();}
 
@@ -361,61 +400,47 @@ function closeAccForm(tenant,onSave){
   return wrap;
 }
 
-function updAsset(type,id,fn){
-  const k=type==="apt"?"apts":"storages";
-  set({[k]:S[k].map(a=>a.id===id?fn(a):a)});
+function updAsset(id,fn){
+  set({apts:S.apts.map(a=>a.id===id?fn(a):a)});
 }
 
 // ── Asset Manager ──
-function renderAssets(type){
-  const isApt=type==="apt",lbl=isApt?"דירה":"מחסן";
-  const assets=isApt?S.apts:S.storages;
-  const floors=isApt?APT_FLOORS:STOR_FLOORS;
-  const fa=S.fArea[type],ff=S.fFloor[type];
-  const allAreas=[...new Set(assets.map(a=>a.area))].sort((a,b)=>a-b);
-  const filtered=assets.filter(a=>(fa==="all"||a.area===Number(fa))&&(ff==="all"||a.floor===Number(ff)));
+function renderAssets(){
+  const assets=S.apts;
+  const ff=S.fFloor;
+  const filtered=assets.filter(a=>ff==="all"||a.floor===Number(ff));
   const wrap=D("");
 
-  // פילטרים - רק קומה
+  // פילטרים
   const fr=D("row");fr.style.marginBottom="12px";
-  fr.appendChild(Col("קומה",Sel([["all","הכל"],...floors.map(f=>[f,fmtFloor(f)])],ff,v=>set({fFloor:{...S.fFloor,[type]:v}},false))));
-  const ab=Btn("blue","+ הוסף "+lbl,()=>set({showAdd:S.showAdd===type?null:type,sel:null},false));
+  fr.appendChild(Col("קומה",Sel([["all","הכל"],...APT_FLOORS.map(f=>[f,fmtFloor(f)])],ff,v=>set({fFloor:v},false))));
+  const ab=Btn("blue","+ הוסף דירה",()=>set({showAdd:S.showAdd?"":true,sel:null},false));
   ab.style.marginRight="auto";fr.appendChild(ab);
   wrap.appendChild(fr);
 
-  // טופס הוספה - ללא re-render בכל הקלדה
-  if(S.showAdd===type){
+  // טופס הוספה
+  if(S.showAdd){
     const fp=D("fpanel");
-    fp.appendChild(mk("p",{style:"font-size:14px;font-weight:700;margin-bottom:12px",txt:lbl+" חדש"}));
-
-    // אובייקט מקומי - לא נוגע ב-state עד שמור
-    const na={number:"",floor:"",area:"",balcony:"",linkedApt:"",rent:"",docs:[],_dname:"",_durl:""};
-
+    fp.appendChild(mk("p",{style:"font-size:14px;font-weight:700;margin-bottom:12px"},["דירה חדשה"]));
+    const na={number:"",floor:"",area:"",balcony:"",sukkah:"",rent:"",note:"",docs:[]};
     const g=D("grid g3");
-
-    const numInp=Inp("text","","",  "לדוג' 101");numInp.oninput=ev=>{na.number=ev.target.value;};
-    g.appendChild(Col("מס' "+lbl,numInp));
-
-    const floorSel=Sel([["","בחר"],...floors.map(f=>[f,fmtFloor(f)])], "",v=>{na.floor=v;});
+    const numInp=Inp("text","","","מס' דירה");numInp.oninput=ev=>{na.number=ev.target.value;};
+    g.appendChild(Col("מס' דירה",numInp));
+    const floorSel=Sel([["","בחר"],...APT_FLOORS.map(f=>[f,fmtFloor(f)])], "",v=>{na.floor=v;});
     g.appendChild(Col("קומה",floorSel));
-
-    const areaInp=Inp("number","","","לדוג' 65");areaInp.oninput=ev=>{na.area=ev.target.value;};
-    g.appendChild(Col('שטח דירה מ"ר',areaInp));
-
-    if(isApt){
-      const balcInp=Inp("number","","","0 אם אין");balcInp.oninput=ev=>{na.balcony=ev.target.value;};
-      g.appendChild(Col('שטח מרפסת מ"ר',balcInp));
-      const rentInp=Inp("number","","","₪ לחודש");rentInp.oninput=ev=>{na.rent=ev.target.value;};
-      g.appendChild(Col('שכר דירה ₪',rentInp));
-    } else {
-      const aptSel=Sel([["","ללא"],...S.apts.map(a=>[a.number,"דירה "+a.number])],"",v=>{na.linkedApt=v;});
-      g.appendChild(Col("קשור לדירה",aptSel));
-      const rentInp=Inp("number","","","₪ לחודש");rentInp.oninput=ev=>{na.rent=ev.target.value;};
-      g.appendChild(Col('שכר דירה ₪',rentInp));
-    }
+    const areaSel=Sel([["","בחר שטח"],["38","38 מ\"ר"],["62.5","62.5 מ\"ר"],["64.3","64.3 מ\"ר"],["86","86 מ\"ר"],["94","94 מ\"ר"]],"",v=>{na.area=v;});
+    g.appendChild(Col('שטח דירה מ"ר',areaSel));
+    const balcInp=Inp("number","","","שטח כולל מ\"ר");balcInp.oninput=ev=>{na.balcony=ev.target.value;};
+    g.appendChild(Col('מרפסת כולל מ"ר',balcInp));
+    const sukkahInp=Inp("number","","","0 אם אין");sukkahInp.oninput=ev=>{na.sukkah=ev.target.value;};
+    g.appendChild(Col('מרפסת סוכה מ"ר',sukkahInp));
+    const rentInp=Inp("number","","","₪ לחודש");rentInp.oninput=ev=>{na.rent=ev.target.value;};
+    g.appendChild(Col('שכר דירה ₪',rentInp));
+    const noteInp=Inp("text","","","לדוג' דירת גן");noteInp.oninput=ev=>{na.note=ev.target.value;};
+    g.appendChild(Col("הערה",noteInp));
     fp.appendChild(g);
 
-    // העלאת קבצים - Cloudinary
+    // העלאת קבצים
     fp.appendChild(mk("hr",{cls:"sep"}));
     fp.appendChild(mk("p",{style:"font-size:13px;font-weight:600;margin-bottom:6px",txt:"📎 הסכם שכירות / תמונות"}));
     const docList2=D("",{style:"margin-bottom:6px"});
@@ -453,23 +478,21 @@ function renderAssets(type){
     ur2.appendChild(Btn("gray","📁 בחר קובץ",()=>fi2.click()));
     ur2.appendChild(Btn("gray","📷 צלם תמונה",()=>ci2.click()));
     fp.appendChild(ur2);
-
     fp.appendChild(mk("hr",{cls:"sep"}));
     const brow=D("row");
     brow.appendChild(Btn("blue","שמור",()=>{
       if(!na.number||na.floor===""||!na.area)return alert("חובה: מספר, קומה, שטח");
       const item={id:uid(),number:na.number,floor:Number(na.floor),area:Number(na.area),
-                  balcony:Number(na.balcony||0),linkedApt:na.linkedApt||"",
-                  rent:Number(na.rent||0),docs:[...na.docs],tenants:[]};
-      const k=isApt?"apts":"storages";
-      set({[k]:[...S[k],item],showAdd:null});
+                  balcony:Number(na.balcony||0),sukkah:Number(na.sukkah||0),
+                  rent:Number(na.rent||0),note:na.note||"",docs:[...na.docs],tenants:[],added:true};
+      set({apts:[...S.apts,item],showAdd:null});
     }));
     brow.appendChild(Btn("gray","ביטול",()=>set({showAdd:null},false)));
     fp.appendChild(brow);
     wrap.appendChild(fp);
   }
 
-  if(filtered.length===0){wrap.appendChild(D("empty",["אין "+lbl+"ות. לחץ '+ הוסף "+lbl+"' להתחלה."]));return wrap;}
+  if(filtered.length===0){wrap.appendChild(D("empty",["אין דירות. לחץ '+ הוסף דירה' להתחלה."]));return wrap;}
 
   filtered.forEach(asset=>{
     const at=getActive(asset);
@@ -481,11 +504,12 @@ function renderAssets(type){
     const nb=mk("div",{style:"min-width:46px;height:46px;border-radius:8px;background:#e8edf5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;color:#1e3a5f;padding:0 6px",txt:asset.number});
     const info=D("");info.style.flex="1";info.style.minWidth="0";
     const top=mk("div",{style:"display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:5px"});
-    top.appendChild(mk("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f",txt:lbl+" "+asset.number}));
+    top.appendChild(mk("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f",txt:"דירה "+asset.number}));
     top.appendChild(Bdg("bgr",fmtFloor(asset.floor)));
     top.appendChild(Bdg("bgr",asset.area+' מ"ר'));
-    if(isApt&&Number(asset.balcony)>0)top.appendChild(Bdg("bgr","מרפסת "+asset.balcony+' מ"ר'));
-    if(!isApt&&asset.linkedApt)top.appendChild(Bdg("bb","דירה "+asset.linkedApt));
+    if(Number(asset.balcony)>0)top.appendChild(Bdg("bgr","מרפסת "+asset.balcony+' מ"ר'));
+    if(Number(asset.sukkah)>0)top.appendChild(Bdg("bgr","סוכה "+asset.sukkah+' מ"ר'));
+    if(asset.note)top.appendChild(Bdg("bo",asset.note));
     if(asset.rent&&Number(asset.rent)>0)top.appendChild(Bdg("bb","₪"+Number(asset.rent).toLocaleString()));
     top.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
     info.appendChild(top);
@@ -496,11 +520,11 @@ function renderAssets(type){
     info.appendChild(sub);
     const head=mk("div",{style:"display:flex;align-items:center;gap:10px"});
     head.appendChild(nb);head.appendChild(info);
+    // מחיקה לכל הדירות
     head.appendChild(Btn("red sm","🗑 מחק",e=>{
       e.stopPropagation();
-      if(confirm("⚠️ האם למחוק "+lbl+" "+asset.number+" לצמיתות?\nכל הדיירים וההיסטוריה יימחקו.")){
-        const k=isApt?"apts":"storages";
-        set({[k]:S[k].filter(a=>a.id!==asset.id),sel:null});
+      if(confirm("⚠️ למחוק דירה "+asset.number+" לצמיתות?\nכל הדיירים וההיסטוריה יימחקו.")){
+        set({apts:S.apts.filter(a=>a.id!==asset.id),sel:null});
       }
     }));
     card.appendChild(head);
@@ -510,15 +534,16 @@ function renderAssets(type){
       const det=mk("div",{style:"border-top:1px solid #e5e7eb;margin-top:12px;padding-top:12px"});
       det.onclick=e=>e.stopPropagation();
       det.appendChild(Btn("green","+ הוסף דייר חדש",()=>{
-        openModal(tenantForm({},"➕ דייר חדש — "+lbl+" "+asset.number,newT=>{
+        openModal(tenantForm({},"➕ דייר חדש — דירה "+asset.number,newT=>{
           const curr=(asset.tenants||[]).map(t=>t.status==="active"?{...t,status:"archived"}:t);
-          updAsset(type,asset.id,a=>({...a,tenants:[...curr,newT]}));
+          updAsset(asset.id,a=>({...a,tenants:[...curr,newT]}));
           closeModal();
         }));
       }));
 
+      // מסמכי הדירה
       if((asset.docs||[]).length>0){
-        det.appendChild(mk("p",{style:"font-size:12px;font-weight:600;margin:10px 0 5px",txt:"📎 מסמכים ותמונות"}));
+        det.appendChild(mk("p",{style:"font-size:12px;font-weight:600;margin:10px 0 5px",txt:"📎 מסמכי הדירה"}));
         (asset.docs||[]).forEach(doc=>{
           const row=D("doc");
           row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:"📄 "+doc.name}));
@@ -539,8 +564,6 @@ function renderAssets(type){
         const key=asset.id+"_"+t.id;
         const isOpen=!!S.expanded[key];
         const tc=D("tc"+(isAct?" act":""));
-
-        // כותרת דייר
         const th=D("th");
         th.onclick=()=>{const ex={...S.expanded};ex[key]=!ex[key];set({expanded:ex},false);};
         const tl=mk("div",{style:"display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1;min-width:0"});
@@ -552,7 +575,6 @@ function renderAssets(type){
         tr2.appendChild(mk("span",{style:"color:#999",txt:isOpen?"▲":"▼"}));
         th.appendChild(tl);th.appendChild(tr2);tc.appendChild(th);
 
-        // גוף דייר
         const tb=D("tb"+(isOpen?" open":""));
         const ig=D("grid g3");ig.style.marginBottom="10px";
         [["טלפון",t.phone||"—"],["אימייל",t.email||"—"],["תעודת זהות",t.idNum||"—"],
@@ -565,10 +587,10 @@ function renderAssets(type){
           const c=D("ic");c.innerHTML="<div class='cl'>"+l+"</div><div class='cv'>"+v+"</div>";ig.appendChild(c);
         });
         tb.appendChild(ig);
-        if(t.notes) tb.appendChild(mk("div",{style:"background:#f8f9fa;border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px",txt:"📝 "+t.notes}));
-        if(t.note) tb.appendChild(mk("div",{style:"background:#fff7ed;border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px;color:#92400e",txt:"🔒 הערת סיום: "+t.note+(t.refund?" · פיקדון הוחזר":"")}));
+        if(t.notes) tb.appendChild(mk("div",{style:"background:#f8f9fa;border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px"},["📝 "+t.notes]));
+        if(t.note) tb.appendChild(mk("div",{style:"background:#fff7ed;border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px;color:#92400e"},["🔒 הערת סיום: "+t.note+(t.refund?" · פיקדון הוחזר":"")]));
         if((t.docs||[]).length>0){
-          tb.appendChild(mk("p",{style:"font-size:12px;font-weight:600;margin-bottom:5px",txt:"📎 מסמכים"}));
+          tb.appendChild(mk("p",{style:"font-size:12px;font-weight:600;margin-bottom:5px"},["📎 מסמכים"]));
           (t.docs||[]).forEach(doc=>{
             const row=D("doc");
             row.appendChild(mk("a",{cls:"dl",href:doc.url,target:"_blank",txt:"📄 "+doc.name}));
@@ -579,20 +601,20 @@ function renderAssets(type){
         const ab=D("actions");
         ab.appendChild(Btn("gray sm","✏️ ערוך",()=>{
           openModal(tenantForm(t,"✏️ עריכת דייר — "+t.name,updated=>{
-            updAsset(type,asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id?updated:x)}));
+            updAsset(asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id?updated:x)}));
             closeModal();
           }));
         }));
         if(isAct) ab.appendChild(Btn("orange sm","🔒 סגור חשבון",()=>{
           openModal(closeAccForm(t,data=>{
-            updAsset(type,asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id
+            updAsset(asset.id,a=>({...a,tenants:a.tenants.map(x=>x.id===t.id
               ?{...t,status:"archived",endDate:data.endDate,note:data.note,refund:data.refund}:x)}));
             closeModal();
           }));
         }));
         ab.appendChild(Btn("red sm","🗑 מחק דייר",()=>{
-          if(confirm("⚠️ האם למחוק את הדייר "+t.name+" לצמיתות?\nהנתונים לא יניתנו לשחזור.")){
-            updAsset(type,asset.id,a=>({...a,tenants:a.tenants.filter(x=>x.id!==t.id)}));
+          if(confirm("⚠️ למחוק את הדייר "+t.name+" לצמיתות?\nהנתונים לא יניתנו לשחזור.")){
+            updAsset(asset.id,a=>({...a,tenants:a.tenants.filter(x=>x.id!==t.id)}));
           }
         }));
         tb.appendChild(ab);tc.appendChild(tb);det.appendChild(tc);
@@ -604,6 +626,7 @@ function renderAssets(type){
   return wrap;
 }
 
+
 // ── ניתוח ──
 function renderReport(){
   const wrap=D(""),tod=today();
@@ -611,58 +634,54 @@ function renderReport(){
   fr.appendChild(Col("מתאריך",Inp("date",S.repFrom,v=>set({repFrom:v},false))));
   fr.appendChild(Col("עד תאריך",Inp("date",S.repTo,v=>set({repTo:v},false))));
   wrap.appendChild(fr);
-  const aA=S.apts.filter(a=>getActive(a)).length,sA=S.storages.filter(a=>getActive(a)).length;
+  const aA=S.apts.filter(a=>getActive(a)).length;
   const aO=S.apts.length?Math.round(S.apts.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/S.apts.length):0;
-  const sO=S.storages.length?Math.round(S.storages.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/S.storages.length):0;
   const aI=S.apts.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
-  const sI=S.storages.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0):0);},0);
   const mg=D("mg");
-  [[aA+"/"+S.apts.length,"דירות מושכרות"],[sA+"/"+S.storages.length,"מחסנים מושכרים"],
-   [aO+"%","תפוסה דירות"],[sO+"%","תפוסה מחסנים"],
-   ["₪"+aI.toLocaleString(),"הכנסה דירות"],["₪"+sI.toLocaleString(),"הכנסה מחסנים"],
-   ["₪"+(aI+sI).toLocaleString(),'סה"כ חודשי']
+  [[aA+"/"+S.apts.length,"דירות מושכרות"],
+   [aO+"%","תפוסה ממוצעת"],
+   ["₪"+aI.toLocaleString(),"הכנסה חודשית"],
+   [S.apts.length-aA,"דירות פנויות"]
   ].forEach(([v,l])=>{const m=D("met");m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>";mg.appendChild(m);});
   wrap.appendChild(mg);
-  [{assets:S.apts,lbl:"דירות",isApt:true},{assets:S.storages,lbl:"מחסנים",isApt:false}].forEach(({assets,lbl,isApt})=>{
-    wrap.appendChild(mk("p",{style:"font-weight:700;font-size:14px;margin-bottom:8px",txt:lbl}));
-    const ow=D("ov"),tbl=document.createElement("table");
-    const heads=[isApt?"דירה":"מחסן","קומה","שטח","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"];
-    tbl.innerHTML="<thead><tr>"+heads.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead>";
-    const tb=document.createElement("tbody");
-    assets.forEach(a=>{
-      const at=getActive(a),occ=calcOcc(a,S.repFrom,S.repTo);
-      const oc=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
-      const tr=document.createElement("tr");
-      tr.innerHTML=["<b>"+a.number+"</b>",fmtFloor(a.floor),a.area+' מ"ר',
-        at?at.name:"<span style='color:#aaa'>פנוי</span>",
-        at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"פעיל"):"—",
-        at?"₪"+Number(at.rent).toLocaleString():"—",
-        "<span style='color:"+oc+";font-weight:700'>"+occ+"%</span>",
-        (a.tenants||[]).length+" דיירים"
-      ].map(c=>"<td>"+c+"</td>").join("");
-      tb.appendChild(tr);
-    });
-    tbl.appendChild(tb);ow.appendChild(tbl);wrap.appendChild(ow);
+  wrap.appendChild(mk("p",{style:"font-weight:700;font-size:14px;margin-bottom:8px"},["דירות"]));
+  const ow=D("ov"),tbl=document.createElement("table");
+  const heads=["דירה","קומה","שטח","מרפסת","סוכה","הערה","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"];
+  tbl.innerHTML="<thead><tr>"+heads.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead>";
+  const tb=document.createElement("tbody");
+  S.apts.forEach(a=>{
+    const at=getActive(a),occ=calcOcc(a,S.repFrom,S.repTo);
+    const oc=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
+    const tr=document.createElement("tr");
+    tr.innerHTML=["<b>"+a.number+"</b>",fmtFloor(a.floor),a.area+' מ"ר',
+      Number(a.balcony)>0?a.balcony+' מ"ר':"—",
+      Number(a.sukkah)>0?a.sukkah+' מ"ר':"—",
+      a.note||"—",
+      at?at.name:"<span style='color:#aaa'>פנוי</span>",
+      at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"פעיל"):"—",
+      at?"₪"+Number(at.rent).toLocaleString():"—",
+      "<span style='color:"+oc+";font-weight:700'>"+occ+"%</span>",
+      (a.tenants||[]).length+" דיירים"
+    ].map(c=>"<td>"+c+"</td>").join("");
+    tb.appendChild(tr);
   });
+  tbl.appendChild(tb);ow.appendChild(tbl);wrap.appendChild(ow);
   return wrap;
 }
 
 // ── השוואה ──
 function renderCompare(){
   const wrap=D("");
-  const src=S.cmpType==="apt"?S.apts:S.storages;
-  const areas=[...new Set(src.map(a=>a.area))].sort((a,b)=>a-b);
+  const areas=[...new Set(S.apts.map(a=>a.area))].sort((a,b)=>a-b);
   const fr=D("row");fr.style.marginBottom="16px";
-  fr.appendChild(Col("סוג נכס",Sel([["apt","דירות"],["stor","מחסנים"]],S.cmpType,v=>set({cmpType:v,cmpArea:"all"},false))));
   fr.appendChild(Col("שטח",Sel([["all","כל הגדלים"],...areas.map(a=>[a,a+' מ"ר'])],S.cmpArea,v=>set({cmpArea:v},false))));
   wrap.appendChild(fr);
-  const assets=S.cmpArea==="all"?src:src.filter(a=>a.area===Number(S.cmpArea));
-  const isApt=S.cmpType==="apt";
+  const assets=S.cmpArea==="all"?S.apts:S.apts.filter(a=>a.area===Number(S.cmpArea));
   const active=assets.filter(a=>getActive(a));
   if(active.length>0){
     const n=active.length||1;
     const ab=mk("div",{style:"background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px"});
-    ab.appendChild(mk("p",{style:"font-weight:700;margin-bottom:10px",txt:"ממוצעים"}));
+    ab.appendChild(mk("p",{style:"font-weight:700;margin-bottom:10px"},["ממוצעים"+(S.cmpArea!=="all"?" — "+S.cmpArea+' מ"ר':"")]));
     const mg=D("mg");
     [["₪"+Math.round(active.reduce((s,a)=>s+Number(getActive(a).rent||0),0)/n).toLocaleString(),'שכ"ד ממוצע'],
      ["₪"+(active.reduce((s,a)=>s+Number(getActive(a).rent||0)/a.area,0)/n).toFixed(0),'₪/מ"ר ממוצע'],
@@ -671,19 +690,20 @@ function renderCompare(){
     ab.appendChild(mg);wrap.appendChild(ab);
   }
   const cg=mk("div",{style:"display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"});
-  if(assets.length===0)cg.appendChild(D("empty",["אין נכסים להשוות"]));
+  if(assets.length===0)cg.appendChild(D("empty",["אין דירות להשוות"]));
   assets.forEach(a=>{
     const at=getActive(a),occ=calcOcc(a,S.repFrom,S.repTo);
     const cc=D("card");
     const ch=mk("div",{style:"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"});
-    ch.appendChild(mk("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f",txt:(isApt?"דירה":"מחסן")+" "+a.number}));
+    ch.appendChild(mk("span",{style:"font-weight:700;font-size:15px;color:#1e3a5f"},["דירה "+a.number]));
     ch.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
     cc.appendChild(ch);
-    if(at) cc.appendChild(mk("p",{cls:"muted",style:"margin-bottom:8px",txt:at.name}));
+    if(at) cc.appendChild(mk("p",{cls:"muted",style:"margin-bottom:8px"},[ at.name]));
     const rg=mk("div",{style:"display:grid;grid-template-columns:1fr 1fr;gap:5px"});
     [["קומה",fmtFloor(a.floor)],["שטח",a.area+' מ"ר'],
-     ...(isApt&&Number(a.balcony)>0?[["מרפסת",a.balcony+' מ"ר']]:[]),
-     ...(!isApt&&a.linkedApt?[["דירה",a.linkedApt]]:[]),
+     ...(Number(a.balcony)>0?[["מרפסת",a.balcony+' מ"ר']]:[]),
+     ...(Number(a.sukkah)>0?[["סוכה",a.sukkah+' מ"ר']]:[]),
+     ...(a.note?[["הערה",a.note]]:[]),
      ['שכ"ד',at?"₪"+Number(at.rent).toLocaleString():"פנוי"],
      ['₪/מ"ר',at?"₪"+(Number(at.rent)/a.area).toFixed(0):"—"],
      ["תפוסה",occ+"%"],["דיירים",(a.tenants||[]).length]
@@ -704,8 +724,7 @@ function render(){
   });
   const app=document.getElementById("app");app.innerHTML="";
   let c;
-  if(S.tab==="דירות")c=renderAssets("apt");
-  else if(S.tab==="מחסנים")c=renderAssets("stor");
+  if(S.tab==="דירות")c=renderAssets();
   else if(S.tab==="ניתוח")c=renderReport();
   else if(S.tab==="השוואה")c=renderCompare();
   else if(S.tab==="אבטחה"){
