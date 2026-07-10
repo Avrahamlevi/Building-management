@@ -2,8 +2,14 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>ניהול בניין</title>
+<meta name="theme-color" content="#1e3a5f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ניהול בניין"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231e3a5f'/%3E%3Ctext x='90' y='120' font-size='90' text-anchor='middle'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;direction:rtl}
@@ -75,9 +81,32 @@ td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 .login-err{color:#dc2626;font-size:13px;margin-bottom:10px;min-height:18px}
 .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 </style>
+<script>
+// ── PWA: manifest מוטמע בקובץ (מאפשר התקנה למסך הבית) ──
+(function setupPWA(){
+  try{
+    const manifest={
+      name:"מערכת ניהול בניין",short_name:"ניהול בניין",
+      start_url:".",display:"standalone",orientation:"portrait",
+      background_color:"#1e3a5f",theme_color:"#1e3a5f",dir:"rtl",lang:"he",
+      icons:[
+        {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%231e3a5f'/%3E%3Ctext x='96' y='128' font-size='96' text-anchor='middle'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any"},
+        {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231e3a5f'/%3E%3Ctext x='256' y='340' font-size='256' text-anchor='middle'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}
+      ]
+    };
+    const mBlob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
+    const link=document.createElement("link");
+    link.rel="manifest";link.href=URL.createObjectURL(mBlob);
+    document.head.appendChild(link);
+  }catch(e){console.warn("PWA setup failed",e);}
+})();
+</script>
 </head>
 <body>
-<div id="hdr"><h1>🏢 מערכת ניהול בניין</h1></div>
+<div id="hdr" style="display:flex;justify-content:space-between;align-items:center">
+  <h1>🏢 מערכת ניהול בניין</h1>
+  <span id="sync-status" style="font-size:12px;opacity:.85"></span>
+</div>
 <div id="main">
   <div class="tabs" id="tabs"></div>
   <div id="app"></div>
@@ -123,6 +152,34 @@ async function dbFetch(path, opts={}){
 }
 async function dbGet(){ return dbFetch(`${DB_BASE}/${KEY}.json`, {cache:'no-store'}); }
 async function dbPut(data){ return dbFetch(`${DB_BASE}/${KEY}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); }
+// סיסמה משותפת בענן
+async function dbGetPassword(){ try{ return await dbFetch(`${DB_BASE}/${KEY}_pwd.json`, {cache:'no-store'}); }catch(e){ return null; } }
+async function dbSetPassword(hash){ try{ await dbFetch(`${DB_BASE}/${KEY}_pwd.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(hash)}); }catch(e){ console.warn('pwd sync failed',e); } }
+// גיבוי אוטומטי - שומר עותק עם חותמת זמן (עד 15 גיבויים אחרונים)
+async function dbBackup(data){
+  try{
+    const stamp = new Date().toISOString().replace(/[:.]/g,'-');
+    await dbFetch(`${DB_BASE}/${KEY}_backups/${stamp}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const backups = await dbFetch(`${DB_BASE}/${KEY}_backups.json`, {cache:'no-store'});
+    if(backups && typeof backups==='object'){
+      const keys = Object.keys(backups).sort();
+      if(keys.length>15){
+        for(const old of keys.slice(0, keys.length-15)){
+          await dbFetch(`${DB_BASE}/${KEY}_backups/${old}.json`, {method:'DELETE'});
+        }
+      }
+    }
+  }catch(e){console.warn('Backup failed',e);}
+}
+async function dbListBackups(){
+  try{
+    const backups = await dbFetch(`${DB_BASE}/${KEY}_backups.json`, {cache:'no-store'});
+    if(backups && typeof backups==='object'){
+      return Object.entries(backups).map(([k,v])=>({stamp:k,data:v})).sort((a,b)=>b.stamp.localeCompare(a.stamp));
+    }
+  }catch(e){console.warn('List backups failed',e);}
+  return [];
+}
 
 async function hashPassword(value){
   const encoder = new TextEncoder();
@@ -135,6 +192,12 @@ async function hashPassword(value){
 }
 
 async function checkPassword(value){
+  // בדוק קודם מול הענן (משותף לכל המכשירים)
+  const cloudHash = await dbGetPassword();
+  if(cloudHash && /^[0-9a-f]{64}$/.test(cloudHash)){
+    return await hashPassword(value)===cloudHash;
+  }
+  // fallback: מקומי
   const stored = localStorage.getItem(PWD_KEY);
   if(!stored) return value === "1977";
   if(/^[0-9a-f]{64}$/.test(stored)) return await hashPassword(value)===stored;
@@ -256,35 +319,65 @@ const calcOcc=(a,from,to)=>{
 
 // ── Storage ──
 function loadLocal(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+let saveTimer=null, lastBackup=0, pendingSave=false;
 async function save(){
   const savingEl=document.getElementById("saving");
-  if(savingEl) savingEl.style.display="block";
-  try{localStorage.setItem(KEY,JSON.stringify({apts:S.apts}));}catch(e){console.warn('Local save failed',e);}
-  try{await dbPut({apts:S.apts,meta:{updatedAt:new Date().toISOString()}});}catch(e){
+  if(savingEl){ savingEl.style.display="block"; savingEl.textContent="💾 שומר..."; }
+  const payload={apts:S.apts,meta:{updatedAt:new Date().toISOString(),updatedTs:Date.now()}};
+  // שמירה מקומית מיידית
+  try{localStorage.setItem(KEY,JSON.stringify(payload));}catch(e){console.warn('Local save failed',e);}
+  // סנכרון לענן
+  try{
+    await dbPut(payload);
+    if(savingEl){ savingEl.textContent="✅ נשמר בענן"; }
+    const st=document.getElementById("sync-status");
+    if(st){ st.textContent="🟢 מסונכרן"; }
+    if(Date.now()-lastBackup > 5*60*1000){
+      lastBackup=Date.now();
+      dbBackup(payload);
+    }
+  }catch(e){
     console.warn('Backend sync failed',e);
-    if(savingEl) savingEl.textContent="⚠️ שגיאת סנכרון לענן";
+    if(savingEl) savingEl.textContent="⚠️ נשמר מקומית (אין חיבור לענן)";
+    const st=document.getElementById("sync-status");
+    if(st){ st.textContent="🟡 מקומי בלבד"; }
   }
   setTimeout(()=>{
-    if(savingEl){
-      savingEl.style.display="none";
-      savingEl.textContent="💾 שומר...";
-    }
-  },700);
+    if(savingEl){ savingEl.style.display="none"; savingEl.textContent="💾 שומר..."; }
+  },1200);
 }
 async function loadRemoteState(){
+  // טוען מהענן ומשווה חותמות זמן - הכי עדכני מנצח
+  const st=document.getElementById("sync-status");
   try{
     const remote = await dbGet();
-    if(remote?.apts && Array.isArray(remote.apts) && remote.apts.length){
-      S.apts = remote.apts;
-      return true;
+    const local = loadLocal();
+    const remoteTs = remote?.meta?.updatedTs || 0;
+    const localTs = local?.meta?.updatedTs || 0;
+    if(remote?.apts && Array.isArray(remote.apts)){
+      if(remoteTs >= localTs){
+        S.apts = remote.apts;
+        try{localStorage.setItem(KEY,JSON.stringify(remote));}catch(e){}
+        if(st) st.textContent="🟢 מסונכרן";
+        return true;
+      } else if(local?.apts){
+        S.apts = local.apts;
+        try{await dbPut(local);}catch(e){}
+        if(st) st.textContent="🟢 מסונכרן";
+        return true;
+      }
     }
-  }catch(e){console.warn('Remote load failed',e);}
+    if(st) st.textContent="🟢 מסונכרן";
+  }catch(e){
+    console.warn('Remote load failed',e);
+    if(st) st.textContent="🟡 מקומי בלבד";
+  }
   return false;
 }
 const saved=loadLocal();
 const S={
   tab:"דירות",
-  apts:saved?.apts||(()=>{localStorage.setItem(KEY,JSON.stringify({apts:INITIAL_APTS,storages:[]}));return INITIAL_APTS;})(),
+  apts:saved?.apts||(()=>{const init={apts:INITIAL_APTS,meta:{updatedAt:new Date().toISOString(),updatedTs:Date.now()}};localStorage.setItem(KEY,JSON.stringify(init));return INITIAL_APTS;})(),
   sel:null,showAdd:null,expanded:{},modal:null,
   fFloor:"all",
   newA:{number:"",floor:"",area:"",balcony:"",note:""},
@@ -483,6 +576,35 @@ function closeAccForm(tenant,onSave){
 
 function updAsset(id,fn){
   set({apts:S.apts.map(a=>a.id===id?fn(a):a)});
+}
+
+// ── מודל שחזור מגיבוי ──
+function buildRestoreModal(backups){
+  const wrap=D("");
+  wrap.appendChild(mk("h3",{style:"font-size:16px;font-weight:700;margin-bottom:8px",txt:"🕐 שחזור מגיבוי"}));
+  wrap.appendChild(mk("p",{cls:"muted",style:"margin-bottom:14px",txt:"בחר גיבוי לשחזור. הנתונים הנוכחיים יוחלפו."}));
+  backups.forEach(b=>{
+    const d=b.data;
+    const count=(d.apts&&Array.isArray(d.apts))?d.apts.length:0;
+    const dt=b.stamp.replace(/-/g,":").slice(0,19).replace("T"," ").replace(/:/g,(m,i)=>i<10?"-":":");
+    let human;
+    try{ human=new Date(d.meta?.updatedAt||b.stamp.replace(/-/g,":")).toLocaleString("he-IL"); }catch(e){ human=b.stamp; }
+    const row=D("card");
+    row.style.cssText="margin-bottom:8px;padding:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center";
+    row.appendChild(mk("div",{},[
+      mk("div",{style:"font-weight:600",txt:human}),
+      mk("div",{cls:"muted",txt:count+" דירות"})
+    ]));
+    row.appendChild(Btn("blue sm","שחזר",()=>{
+      closeModal();
+      openConfirm("⚠️ לשחזר גיבוי זה? הנתונים הנוכחיים ("+S.apts.length+" דירות) יוחלפו ב-"+count+" דירות.",()=>{
+        set({apts:d.apts,sel:null});
+      });
+    }));
+    wrap.appendChild(row);
+  });
+  wrap.appendChild(Btn("gray","סגור",closeModal));
+  return wrap;
 }
 
 // ── Asset Manager ──
@@ -827,11 +949,93 @@ function render(){
       if(!(await checkPassword(cur.value))){msg.style.color="#dc2626";msg.textContent="❌ הסיסמה הנוכחית שגויה";return;}
       if(!n1.value){msg.style.color="#dc2626";msg.textContent="❌ נא להזין סיסמה חדשה";return;}
       if(n1.value!==n2.value){msg.style.color="#dc2626";msg.textContent="❌ הסיסמאות החדשות לא תואמות";return;}
-      localStorage.setItem(PWD_KEY,await hashPassword(n1.value));
-      msg.style.color="#16a34a";msg.textContent="✅ הסיסמה שונתה בהצלחה!";
+      const newHash=await hashPassword(n1.value);
+      localStorage.setItem(PWD_KEY,newHash);
+      await dbSetPassword(newHash);
+      msg.style.color="#16a34a";msg.textContent="✅ הסיסמה שונתה בהצלחה! (מסונכרן לכל המכשירים)";
       cur.value="";n1.value="";n2.value="";
     }));
     wrap.appendChild(card);
+
+    // ── גיבוי וייצוא ──
+    const cardBackup=D("card");
+    cardBackup.style.marginTop="10px";
+    cardBackup.appendChild(mk("p",{style:"font-weight:600;font-size:14px;margin-bottom:4px",txt:"💾 גיבוי ונתונים"}));
+    cardBackup.appendChild(mk("p",{cls:"muted",style:"margin-bottom:12px",txt:"הנתונים נשמרים אוטומטית בענן ובמכשיר. כאן אפשר לייצא, לייבא או לשחזר גיבוי."}));
+    const backupMsg=mk("p",{style:"font-size:13px;margin:8px 0;min-height:18px",txt:""});
+    const backupBtns=D("row");
+
+    // ייצוא לקובץ
+    backupBtns.appendChild(Btn("gray","⬇️ ייצוא לקובץ",()=>{
+      const data=JSON.stringify({apts:S.apts,meta:{updatedAt:new Date().toISOString(),exported:true}},null,2);
+      const blob=new Blob([data],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;a.download="ניהול-בניין-גיבוי-"+today()+".json";
+      a.click();URL.revokeObjectURL(url);
+      backupMsg.style.color="#16a34a";backupMsg.textContent="✅ הקובץ יורד";
+    }));
+
+    // ייבוא מקובץ
+    const importInp=mk("input",{type:"file",accept:".json"});
+    importInp.style.display="none";
+    importInp.onchange=ev=>{
+      const file=ev.target.files[0];if(!file)return;
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try{
+          const parsed=JSON.parse(e.target.result);
+          if(parsed.apts && Array.isArray(parsed.apts)){
+            openConfirm("⚠️ פעולה זו תחליף את כל הנתונים הנוכחיים ב-"+parsed.apts.length+" דירות מהקובץ. להמשיך?",()=>{
+              set({apts:parsed.apts,sel:null});
+              backupMsg.style.color="#16a34a";backupMsg.textContent="✅ יובאו "+parsed.apts.length+" דירות";
+            });
+          } else {
+            backupMsg.style.color="#dc2626";backupMsg.textContent="❌ קובץ לא תקין";
+          }
+        }catch(err){
+          backupMsg.style.color="#dc2626";backupMsg.textContent="❌ שגיאה בקריאת הקובץ";
+        }
+      };
+      reader.readAsText(file);
+      importInp.value="";
+    };
+    cardBackup.appendChild(importInp);
+    backupBtns.appendChild(Btn("gray","⬆️ ייבוא מקובץ",()=>importInp.click()));
+
+    // שחזור מגיבוי בענן
+    backupBtns.appendChild(Btn("gray","🕐 שחזור מגיבוי",async ()=>{
+      backupMsg.style.color="#666";backupMsg.textContent="⏳ טוען גיבויים...";
+      const backups=await dbListBackups();
+      if(!backups.length){
+        backupMsg.style.color="#dc2626";backupMsg.textContent="אין גיבויים זמינים עדיין";
+        return;
+      }
+      openModal(buildRestoreModal(backups));
+      backupMsg.textContent="";
+    }));
+
+    cardBackup.appendChild(backupBtns);
+    cardBackup.appendChild(backupMsg);
+    wrap.appendChild(cardBackup);
+
+    // ── התקנה למסך הבית ──
+    const cardInstall=D("card");
+    cardInstall.style.marginTop="10px";
+    cardInstall.appendChild(mk("p",{style:"font-weight:600;font-size:14px;margin-bottom:8px",txt:"📲 התקנה למסך הבית"}));
+    const isStandalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone;
+    if(isStandalone){
+      cardInstall.appendChild(mk("p",{cls:"muted",txt:"✅ האפליקציה מותקנת ופועלת ממסך הבית"}));
+    } else {
+      cardInstall.appendChild(mk("p",{cls:"muted",style:"margin-bottom:8px",txt:"אפשר להתקין את המערכת כאפליקציה על הטלפון:"}));
+      const iosBox=mk("div",{style:"background:#f8fafc;border-radius:8px;padding:10px;font-size:13px;line-height:1.7;margin-bottom:8px"});
+      iosBox.innerHTML="<b>אייפון (Safari):</b><br>לחץ על כפתור השיתוף ⬆️ → גלול ובחר \"הוסף למסך הבית\"";
+      cardInstall.appendChild(iosBox);
+      const androidBox=mk("div",{style:"background:#f8fafc;border-radius:8px;padding:10px;font-size:13px;line-height:1.7"});
+      androidBox.innerHTML="<b>אנדרואיד (Chrome):</b><br>לחץ על ⋮ בפינה → \"התקן אפליקציה\" / \"הוסף למסך הבית\"";
+      cardInstall.appendChild(androidBox);
+    }
+    wrap.appendChild(cardInstall);
 
     const card2=D("card");
     card2.style.marginTop="10px";
@@ -848,9 +1052,52 @@ function render(){
   const m=renderModal();if(m)app.appendChild(m);
 }
 async function initApp(){
+  // חיווי טעינה
+  const app=document.getElementById("app");
+  if(app) app.innerHTML='<div style="text-align:center;padding:60px;color:#888">⏳ טוען נתונים מהענן...</div>';
   await loadRemoteState();
   if(!isLoggedIn()){ showLoginScreen(); } else { render(); }
+  // רענון מהענן בכל חזרה למסך (מכשירים אחרים אולי עדכנו)
+  document.addEventListener("visibilitychange",async ()=>{
+    if(!document.hidden && isLoggedIn()){
+      const remote=await dbGet().catch(()=>null);
+      const remoteTs=remote?.meta?.updatedTs||0;
+      const localTs=(loadLocal()?.meta?.updatedTs)||0;
+      if(remote?.apts && remoteTs>localTs){
+        S.apts=remote.apts;
+        try{localStorage.setItem(KEY,JSON.stringify(remote));}catch(e){}
+        render();
+      }
+    }
+  });
 }
+
+// ── כפתור התקנה למסך הבית ──
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  showInstallButton();
+});
+function showInstallButton(){
+  if(document.getElementById("install-btn"))return;
+  const btn=document.createElement("button");
+  btn.id="install-btn";
+  btn.textContent="📲 התקן אפליקציה";
+  btn.style.cssText="position:fixed;bottom:20px;left:20px;background:#16a34a;color:#fff;border:none;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;z-index:300;box-shadow:0 4px 12px rgba(0,0,0,.25);font-family:Arial";
+  btn.onclick=async ()=>{
+    if(!deferredPrompt)return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    btn.remove();
+  };
+  document.body.appendChild(btn);
+}
+window.addEventListener("appinstalled",()=>{
+  const b=document.getElementById("install-btn");if(b)b.remove();
+});
+
 initApp();
 </script>
 </body>
