@@ -316,6 +316,12 @@ const calcOcc=(a,from,to)=>{
   }
   return Math.min(100,Math.round(occ/tot*100));
 };
+// תפוסה שנתית לפי השנה הקלנדרית הנוכחית (ינואר-דצמבר)
+const calcAnnualOcc=(a)=>{
+  const y=new Date().getFullYear();
+  return calcOcc(a, y+"-01-01", y+"-12-31");
+};
+const occColor=(o)=>o>=80?"#16a34a":o>=50?"#d97706":"#dc2626";
 
 // ── Storage ──
 function loadLocal(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
@@ -715,6 +721,10 @@ function renderAssets(){
     if(asset.note)top.appendChild(Bdg("bo",asset.note));
     if(asset.rent&&Number(asset.rent)>0)top.appendChild(Bdg("bb","₪"+Number(asset.rent).toLocaleString()));
     top.appendChild(at?Bdg("bg","מושכר"):Bdg("by","פנוי"));
+    // תפוסה שנתית
+    const annualOcc=calcAnnualOcc(asset);
+    const occBadge=mk("span",{cls:"bdg",style:"background:"+occColor(annualOcc)+"22;color:"+occColor(annualOcc)+";font-weight:700",txt:"תפוסה "+annualOcc+"%"});
+    top.appendChild(occBadge);
     info.appendChild(top);
     const sub=mk("div",{cls:"muted"});
     sub.textContent=at
@@ -839,22 +849,24 @@ function renderReport(){
   wrap.appendChild(fr);
   const aA=S.apts.filter(a=>getActive(a)).length;
   const aO=S.apts.length?Math.round(S.apts.reduce((s,a)=>s+calcOcc(a,S.repFrom,S.repTo),0)/S.apts.length):0;
+  const aOannual=S.apts.length?Math.round(S.apts.reduce((s,a)=>s+calcAnnualOcc(a),0)/S.apts.length):0;
   const aI=S.apts.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
   const mg=D("mg");
   [[aA+"/"+S.apts.length,"דירות מושכרות"],
-   [aO+"%","תפוסה ממוצעת"],
+   [aOannual+"%","תפוסה שנתית ("+new Date().getFullYear()+")"],
    ["₪"+aI.toLocaleString(),"הכנסה חודשית"],
    [S.apts.length-aA,"דירות פנויות"]
   ].forEach(([v,l])=>{const m=D("met");m.innerHTML="<div class='v'>"+v+"</div><div class='l'>"+l+"</div>";mg.appendChild(m);});
   wrap.appendChild(mg);
   wrap.appendChild(mk("p",{style:"font-weight:700;font-size:14px;margin-bottom:8px"},["דירות"]));
   const ow=D("ov"),tbl=document.createElement("table");
-  const heads=["דירה","קומה","שטח","מרפסת","סוכה","הערה","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה","היסטוריה"];
+  const heads=["דירה","קומה","שטח","מרפסת","סוכה","הערה","דייר פעיל","כניסה","יציאה",'שכ"ד',"תפוסה (טווח)","תפוסה שנתי","היסטוריה"];
   tbl.innerHTML="<thead><tr>"+heads.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead>";
   const tb=document.createElement("tbody");
   S.apts.forEach(a=>{
     const at=getActive(a),occ=calcOcc(a,S.repFrom,S.repTo);
-    const oc=occ>=80?"#16a34a":occ>=50?"#d97706":"#dc2626";
+    const annual=calcAnnualOcc(a);
+    const oc=occColor(occ), oca=occColor(annual);
     const tr=document.createElement("tr");
     tr.innerHTML=["<b>"+a.number+"</b>",fmtFloor(a.floor),a.area+' מ"ר',
       Number(a.balcony)>0?a.balcony+' מ"ר':"—",
@@ -864,6 +876,7 @@ function renderReport(){
       at?fmtDate(at.startDate):"—",at?(at.endDate?fmtDate(at.endDate):"פעיל"):"—",
       at?"₪"+Number(at.rent).toLocaleString():"—",
       "<span style='color:"+oc+";font-weight:700'>"+occ+"%</span>",
+      "<span style='color:"+oca+";font-weight:700'>"+annual+"%</span>",
       (a.tenants||[]).length+" דיירים"
     ].map(c=>"<td>"+c+"</td>").join("");
     tb.appendChild(tr);
