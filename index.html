@@ -140,6 +140,13 @@ const TABS=["דירות","ניתוח","השוואה","אבטחה"];
 const KEY="bldg_v6";
 const PWD_KEY="bldg_pwd";
 const DB_BASE = "https://building-management-a4899-default-rtdb.firebaseio.com";
+// ── אבטחה רמה 2: נתיב נתונים סודי נגזר מהסיסמה ──
+// הנתונים נשמרים תחת נתיב שאף אחד לא יכול לנחש בלי לדעת את הסיסמה
+let DATA_KEY = KEY;
+async function deriveDataKey(password){
+  const h = await hashPassword("bldg_salt_2024::"+password);
+  return "secure_" + h.slice(0,32);
+}
 
 async function dbFetch(path, opts={}){
   try{
@@ -150,22 +157,22 @@ async function dbFetch(path, opts={}){
     throw e;
   }
 }
-async function dbGet(){ return dbFetch(`${DB_BASE}/${KEY}.json`, {cache:'no-store'}); }
-async function dbPut(data){ return dbFetch(`${DB_BASE}/${KEY}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); }
-// סיסמה משותפת בענן
+async function dbGet(){ return dbFetch(`${DB_BASE}/${DATA_KEY}.json`, {cache:'no-store'}); }
+async function dbPut(data){ return dbFetch(`${DB_BASE}/${DATA_KEY}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); }
+// סיסמה משותפת בענן - נשמרת תחת נתיב ציבורי קבוע (רק ה-hash, לא הסיסמה עצמה)
 async function dbGetPassword(){ try{ return await dbFetch(`${DB_BASE}/${KEY}_pwd.json`, {cache:'no-store'}); }catch(e){ return null; } }
 async function dbSetPassword(hash){ try{ await dbFetch(`${DB_BASE}/${KEY}_pwd.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(hash)}); }catch(e){ console.warn('pwd sync failed',e); } }
 // גיבוי אוטומטי - שומר עותק עם חותמת זמן (עד 15 גיבויים אחרונים)
 async function dbBackup(data){
   try{
     const stamp = new Date().toISOString().replace(/[:.]/g,'-');
-    await dbFetch(`${DB_BASE}/${KEY}_backups/${stamp}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-    const backups = await dbFetch(`${DB_BASE}/${KEY}_backups.json`, {cache:'no-store'});
+    await dbFetch(`${DB_BASE}/${DATA_KEY}_backups/${stamp}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const backups = await dbFetch(`${DB_BASE}/${DATA_KEY}_backups.json`, {cache:'no-store'});
     if(backups && typeof backups==='object'){
       const keys = Object.keys(backups).sort();
       if(keys.length>15){
         for(const old of keys.slice(0, keys.length-15)){
-          await dbFetch(`${DB_BASE}/${KEY}_backups/${old}.json`, {method:'DELETE'});
+          await dbFetch(`${DB_BASE}/${DATA_KEY}_backups/${old}.json`, {method:'DELETE'});
         }
       }
     }
@@ -173,7 +180,7 @@ async function dbBackup(data){
 }
 async function dbListBackups(){
   try{
-    const backups = await dbFetch(`${DB_BASE}/${KEY}_backups.json`, {cache:'no-store'});
+    const backups = await dbFetch(`${DB_BASE}/${DATA_KEY}_backups.json`, {cache:'no-store'});
     if(backups && typeof backups==='object'){
       return Object.entries(backups).map(([k,v])=>({stamp:k,data:v})).sort((a,b)=>b.stamp.localeCompare(a.stamp));
     }
@@ -283,7 +290,14 @@ window.tryLogin=async function(){
   if(await checkPassword(val)){
     resetAuthFailures();
     sessionStorage.setItem("auth","ok");
+    // אבטחה רמה 2: גזור נתיב נתונים סודי מהסיסמה
+    DATA_KEY = await deriveDataKey(val);
+    sessionStorage.setItem("dk", DATA_KEY);
     document.getElementById("login-screen").remove();
+    // טען נתונים מהנתיב הסודי
+    const app=document.getElementById("app");
+    if(app) app.innerHTML='<div style="text-align:center;padding:60px;color:#888">⏳ טוען נתונים מהענן...</div>';
+    await loadRemoteState();
     render();
   } else {
     loginFailures++;
@@ -356,7 +370,19 @@ async function loadRemoteState(){
   // טוען מהענן ומשווה חותמות זמן - הכי עדכני מנצח
   const st=document.getElementById("sync-status");
   try{
-    const remote = await dbGet();
+    let remote = await dbGet();
+    // ── מיגרציה: אם אין נתונים בנתיב הסודי, בדוק אם יש בנתיב הישן והעבר ──
+    if((!remote || !remote.apts) && DATA_KEY!==KEY){
+      try{
+        const oldData = await dbFetch(`${DB_BASE}/${KEY}.json`, {cache:'no-store'});
+        if(oldData && oldData.apts && Array.isArray(oldData.apts) && oldData.apts.length){
+          // העבר לנתיב הסודי
+          await dbPut(oldData);
+          remote = oldData;
+          console.log('Migrated data to secure path');
+        }
+      }catch(e){/* אין נתונים ישנים - זה בסדר */}
+    }
     const local = loadLocal();
     const remoteTs = remote?.meta?.updatedTs || 0;
     const localTs = local?.meta?.updatedTs || 0;
@@ -372,6 +398,12 @@ async function loadRemoteState(){
         if(st) st.textContent="🟢 מסונכרן";
         return true;
       }
+    } else if(local?.apts){
+      // אין בענן אבל יש מקומי - העלה לענן
+      S.apts = local.apts;
+      try{await dbPut(local);}catch(e){}
+      if(st) st.textContent="🟢 מסונכרן";
+      return true;
     }
     if(st) st.textContent="🟢 מסונכרן";
   }catch(e){
@@ -961,11 +993,31 @@ function render(){
     card.appendChild(Btn("blue","שמור סיסמה חדשה",async ()=>{
       if(!(await checkPassword(cur.value))){msg.style.color="#dc2626";msg.textContent="❌ הסיסמה הנוכחית שגויה";return;}
       if(!n1.value){msg.style.color="#dc2626";msg.textContent="❌ נא להזין סיסמה חדשה";return;}
+      if(n1.value.length<4){msg.style.color="#dc2626";msg.textContent="❌ הסיסמה חייבת להיות לפחות 4 תווים";return;}
       if(n1.value!==n2.value){msg.style.color="#dc2626";msg.textContent="❌ הסיסמאות החדשות לא תואמות";return;}
+      msg.style.color="#666";msg.textContent="⏳ מעדכן סיסמה ומעביר נתונים...";
       const newHash=await hashPassword(n1.value);
+      // אבטחה רמה 2: העבר נתונים לנתיב הסודי החדש
+      const newDataKey = await deriveDataKey(n1.value);
+      const currentData = {apts:S.apts,meta:{updatedAt:new Date().toISOString(),updatedTs:Date.now()}};
+      try{
+        // שמור בנתיב החדש
+        await dbFetch(`${DB_BASE}/${newDataKey}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(currentData)});
+        // מחק מהנתיב הישן
+        const oldKey = DATA_KEY;
+        if(oldKey && oldKey!==newDataKey){
+          await dbFetch(`${DB_BASE}/${oldKey}.json`, {method:'DELETE'}).catch(()=>{});
+          await dbFetch(`${DB_BASE}/${oldKey}_backups.json`, {method:'DELETE'}).catch(()=>{});
+        }
+        DATA_KEY = newDataKey;
+        sessionStorage.setItem("dk", newDataKey);
+      }catch(e){
+        msg.style.color="#dc2626";msg.textContent="⚠️ שגיאה בהעברת נתונים. בדוק חיבור לאינטרנט.";
+        return;
+      }
       localStorage.setItem(PWD_KEY,newHash);
       await dbSetPassword(newHash);
-      msg.style.color="#16a34a";msg.textContent="✅ הסיסמה שונתה בהצלחה! (מסונכרן לכל המכשירים)";
+      msg.style.color="#16a34a";msg.textContent="✅ הסיסמה שונתה והנתונים הועברו בבטחה! (מסונכרן לכל המכשירים)";
       cur.value="";n1.value="";n2.value="";
     }));
     wrap.appendChild(card);
@@ -1065,14 +1117,21 @@ function render(){
   const m=renderModal();if(m)app.appendChild(m);
 }
 async function initApp(){
-  // חיווי טעינה
-  const app=document.getElementById("app");
-  if(app) app.innerHTML='<div style="text-align:center;padding:60px;color:#888">⏳ טוען נתונים מהענן...</div>';
-  await loadRemoteState();
-  if(!isLoggedIn()){ showLoginScreen(); } else { render(); }
+  // אם כבר מחוברים (session קיים) - שחזר את הנתיב הסודי
+  const savedDK = sessionStorage.getItem("dk");
+  if(isLoggedIn() && savedDK){
+    DATA_KEY = savedDK;
+    const app=document.getElementById("app");
+    if(app) app.innerHTML='<div style="text-align:center;padding:60px;color:#888">⏳ טוען נתונים מהענן...</div>';
+    await loadRemoteState();
+    render();
+  } else {
+    // לא מחוברים - הצג מסך כניסה (הנתונים ייטענו אחרי התחברות)
+    showLoginScreen();
+  }
   // רענון מהענן בכל חזרה למסך (מכשירים אחרים אולי עדכנו)
   document.addEventListener("visibilitychange",async ()=>{
-    if(!document.hidden && isLoggedIn()){
+    if(!document.hidden && isLoggedIn() && DATA_KEY!==KEY){
       const remote=await dbGet().catch(()=>null);
       const remoteTs=remote?.meta?.updatedTs||0;
       const localTs=(loadLocal()?.meta?.updatedTs)||0;
