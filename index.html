@@ -374,6 +374,8 @@ const calcAnnualOcc=(a)=>{
   return calcOcc(a, y+"-01-01", y+"-12-31");
 };
 const occColor=(o)=>o>=80?"#16a34a":o>=50?"#d97706":"#dc2626";
+// ועד בית מחושב כאחוז משכר הדירה
+const vaadAmt=(t)=>Math.round(Number(t.rent||0)*Number(t.vaadPct||0)/100);
 
 // ── Storage ──
 function loadLocal(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
@@ -530,7 +532,7 @@ function openConfirm(message,onConfirm){
 // ── טופס דייר ──
 function tenantForm(init,title,onSave){
   const d={name:"",phone:"",email:"",idNum:"",startDate:"",endDate:"",
-           rent:"",vaad:"",deposit:"",notes:"",docs:[],...(init||{})};
+           rent:"",vaadPct:"",deposit:"",notes:"",docs:[],...(init||{})};
   // עותק עמוק של docs
   d.docs=JSON.parse(JSON.stringify(d.docs||[]));
 
@@ -542,14 +544,27 @@ function tenantForm(init,title,onSave){
   const fields=[["שם מלא","name","text"],["טלפון","phone","tel"],["אימייל","email","email"],
    ["תעודת זהות","idNum","text"],["תאריך כניסה","startDate","date"],
    ["תאריך יציאה","endDate","date"],['שכ"ד ₪',"rent","number"],
-   ["ועד בית ₪","vaad","number"],["פיקדון ₪","deposit","number"]];
+   ["ועד בית %","vaadPct","number"],["פיקדון ₪","deposit","number"]];
+  let rentInp=null, vaadReadout=null;
+  function updateVaadReadout(){
+    if(!vaadReadout)return;
+    const amt=Math.round(Number(d.rent||0)*Number(d.vaadPct||0)/100);
+    vaadReadout.textContent = (Number(d.vaadPct)>0) ? ("= ₪"+amt.toLocaleString()+" לחודש") : "";
+  }
   fields.forEach(([l,k,t])=>{
-    const inp=mk("input",{type:t,placeholder:""});
+    const inp=mk("input",{type:t,placeholder:k==="vaadPct"?"אחוז משכ\"ד":""});
     inp.value=d[k]||"";
-    inp.oninput=ev=>{d[k]=ev.target.value;};
-    g.appendChild(Col(l,inp));
+    inp.oninput=ev=>{d[k]=ev.target.value; if(k==="rent"||k==="vaadPct")updateVaadReadout();};
+    if(k==="rent")rentInp=inp;
+    const col=Col(l,inp);
+    if(k==="vaadPct"){
+      vaadReadout=mk("div",{style:"font-size:11px;color:#16a34a;font-weight:600;margin-top:2px;min-height:14px"});
+      col.appendChild(vaadReadout);
+    }
+    g.appendChild(col);
   });
   wrap.appendChild(g);
+  updateVaadReadout();
   wrap.appendChild(mk("hr",{cls:"sep"}));
 
   const noteLbl=Lbl("הערות");
@@ -625,7 +640,7 @@ function tenantForm(init,title,onSave){
   brow.appendChild(Btn("green","✅ שמור דייר",()=>{
     if(!d.name||!d.startDate||!d.rent)return alert("חובה: שם, תאריך כניסה, שכ\"ד");
     onSave({...d,id:d.id||uid(),status:d.status||"active",
-            rent:Number(d.rent)||0,vaad:Number(d.vaad)||0,deposit:Number(d.deposit)||0});
+            rent:Number(d.rent)||0,vaadPct:Number(d.vaadPct)||0,deposit:Number(d.deposit)||0});
   }));
   brow.appendChild(Btn("gray","ביטול",closeModal));
   wrap.appendChild(brow);
@@ -887,7 +902,7 @@ function renderAssets(){
         [["טלפון",t.phone||"—"],["אימייל",t.email||"—"],["תעודת זהות",t.idNum||"—"],
          ["פיקדון","₪"+Number(t.deposit||0).toLocaleString()],
          ['שכ"ד',"₪"+Number(t.rent||0).toLocaleString()],
-         ["ועד","₪"+Number(t.vaad||0).toLocaleString()],
+         ["ועד בית",Number(t.vaadPct||0)>0?(t.vaadPct+"% · ₪"+vaadAmt(t).toLocaleString()):"—"],
          ["כניסה",fmtDate(t.startDate)],["יציאה",t.endDate?fmtDate(t.endDate):"—"],
          ["משך",t.startDate?monthsBetween(t.startDate,t.endDate||today())+" חודשים":"—"]
         ].forEach(([l,v])=>{
@@ -945,7 +960,7 @@ function renderReport(){
   // סיכום דירות + מחסנים
   const aA=S.apts.filter(a=>getActive(a)).length;
   const aOannual=S.apts.length?Math.round(S.apts.reduce((s,a)=>s+calcAnnualOcc(a),0)/S.apts.length):0;
-  const aI=S.apts.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0)+Number(t.vaad||0):0);},0);
+  const aI=S.apts.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0)+vaadAmt(t):0);},0);
   const sA=S.storages.filter(a=>getActive(a)).length;
   const sOannual=S.storages.length?Math.round(S.storages.reduce((s,a)=>s+calcAnnualOcc(a),0)/S.storages.length):0;
   const sI=S.storages.reduce((s,a)=>{const t=getActive(a);return s+(t?Number(t.rent||0):0);},0);
